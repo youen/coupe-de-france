@@ -18,7 +18,8 @@ type alias Model =
 type Msg
     = SelectEquipe String
     | ToggleEquipeCoach String
-    | SelectVestiaire String
+    | SelectVestiaire Int
+    | SetPrintMode Bool
     | SetContexte UserContext
     | ResetContexte
 
@@ -55,12 +56,16 @@ update msg model =
                 _ ->
                     ( { model | contexte = Just (PourCoach (Set.singleton name)) }, Cmd.none )
 
-        SelectVestiaire vStr ->
-            let
-                vNum =
-                    String.toInt vStr |> Maybe.withDefault 0
-            in
-            ( { model | contexte = Just (PourVestiaire vNum) }, Cmd.none )
+        SelectVestiaire vNum ->
+            ( { model | contexte = Just (PourVestiaire vNum False) }, Cmd.none )
+
+        SetPrintMode isPrint ->
+            case model.contexte of
+                Just (PourVestiaire vNum _) ->
+                    ( { model | contexte = Just (PourVestiaire vNum isPrint) }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         SetContexte ctx ->
             ( { model | contexte = Just ctx }, Cmd.none )
@@ -77,8 +82,8 @@ view model =
 
         Just ctx ->
             case ctx of
-                PourVestiaire n ->
-                    if n > 0 then
+                PourVestiaire n isPrint ->
+                    if isPrint && n > 0 then
                         viewVestiairePrint model.planning n
 
                     else
@@ -100,7 +105,7 @@ viewRoleSelection =
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
             [ roleButton "Patineur" (PourPatineur "") "⛸️" "Consultez vos horaires personnels"
             , roleButton "Coach" (PourCoach Set.empty) "📋" "Gérez plusieurs équipes simultanément"
-            , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Impression pour les portes des vestiaires"
+            , roleButton "Vestiaire" (PourVestiaire 0 False) "🚪" "Impression pour les portes des vestiaires"
             , roleButton "Buvette" PourBuvette "☕" "Anticipez les rushs de surfaçage"
             ]
         ]
@@ -129,7 +134,20 @@ viewStandardLayout model ctx =
             [ div [ class "max-w-4xl mx-auto flex items-center justify-between" ]
                 [ button [ class "flex items-center gap-2 text-slate-600 hover:text-[#ea3a60] font-bold transition-colors", onClick ResetContexte ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
-                , div [ class "font-black text-xl gradient-text" ] [ text "CDF 2026" ]
+                , div [ class "flex items-center gap-4" ]
+                    [ case ctx of
+                        PourVestiaire n _ ->
+                            if n > 0 then
+                                button [ class "hidden md:flex items-center gap-2 px-4 py-1.5 bg-[#ea3a60] text-white rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95", onClick (SetPrintMode True) ]
+                                    [ text "🖨️ Mode Impression" ]
+
+                            else
+                                text ""
+
+                        _ ->
+                            text ""
+                    , div [ class "font-black text-xl gradient-text" ] [ text "CDF 2026" ]
+                    ]
                 ]
             ]
         , main_ [ class "max-w-4xl mx-auto p-4 md:p-6" ]
@@ -142,26 +160,30 @@ viewStandardLayout model ctx =
 
 viewVestiairePrint : List Creneau -> Int -> Html Msg
 viewVestiairePrint planning vNum =
-    div [ class "min-h-screen bg-white text-black p-10 font-sans" ]
-        [ button [ class "print:hidden fixed top-6 left-6 flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold transition-all", onClick ResetContexte ]
-            [ text "← Retour" ]
-        , div [ class "max-w-3xl mx-auto border-[12px] border-black p-12" ]
-            [ h1 [ class "text-8xl font-black mb-4 uppercase tracking-tighter" ] [ text "VESTIAIRE" ]
-            , div [ class "text-9xl font-black mb-16" ] [ text (String.fromInt vNum) ]
-            , div [ class "space-y-12" ]
-                (List.map viewVestiaireItem (getHorairesVestiaire vNum planning))
+    div [ class "min-h-screen bg-white text-black p-10 font-sans print-page" ]
+        [ button [ class "print:hidden fixed top-6 left-6 flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold transition-all shadow-lg", onClick (SetPrintMode False) ]
+            [ text "← Mode Consultation" ]
+        , div [ class "max-w-4xl mx-auto border-[16px] border-black p-16 h-[277mm] flex flex-col justify-between" ]
+            [ div []
+                [ h1 [ class "text-9xl font-black mb-4 uppercase tracking-tighter text-center" ] [ text "VESTIAIRE" ]
+                , div [ class "text-[20rem] leading-none font-black text-center mb-20" ] [ text (String.fromInt vNum) ]
+                ]
+            , div [ class "space-y-10 flex-1 overflow-hidden" ]
+                (List.take 6 (List.map viewVestiaireItem (getHorairesVestiaire vNum planning)))
+            , div [ class "text-center text-4xl font-bold mt-10 border-t-8 border-black pt-10" ]
+                [ text "COUPE DE FRANCE 2026" ]
             ]
         ]
 
 
 viewVestiaireItem : ViewCreneau -> Html Msg
 viewVestiaireItem item =
-    div [ class "flex items-baseline justify-between border-b-4 border-black pb-8" ]
+    div [ class "flex items-center justify-between border-b-8 border-black pb-6" ]
         [ div []
-            [ div [ class "text-5xl font-black uppercase mb-2" ] [ text item.name ]
-            , div [ class "text-3xl font-medium text-slate-600" ] [ text item.category ]
+            [ div [ class "text-6xl font-black uppercase mb-1" ] [ text item.name ]
+            , div [ class "text-4xl font-bold text-black/60" ] [ text item.category ]
             ]
-        , div [ class "text-7xl font-mono font-black" ] [ text item.time ]
+        , div [ class "text-8xl font-mono font-black tabular-nums" ] [ text item.time ]
         ]
 
 
@@ -197,20 +219,24 @@ viewSelection model ctx =
                     (List.map (\eq -> viewCheckbox eq (Set.member eq set)) equipes)
                 ]
 
-        PourVestiaire _ ->
-            div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
-                [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-3" ] [ text "Localisation" ]
-                , div [ class "relative" ]
-                    [ select
-                        [ class "block w-full text-lg font-bold p-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-[#ea3a60] appearance-none cursor-pointer"
-                        , onChange SelectVestiaire
-                        ]
-                        (option [ value "" ] [ text "-- Sélectionnez un vestiaire --" ]
-                            :: List.map (\v -> option [ value (String.fromInt v) ] [ text ("Vestiaire " ++ String.fromInt v) ]) vestiaires
+        PourVestiaire vNum _ ->
+            if vNum == 0 then
+                div [ class "grid grid-cols-2 md:grid-cols-4 gap-4" ]
+                    (List.map
+                        (\v ->
+                            button
+                                [ class "p-8 bg-white border-2 border-slate-100 rounded-3xl hover:border-[#ea3a60] transition-all group active:scale-95 shadow-sm"
+                                , onClick (SelectVestiaire v)
+                                ]
+                                [ div [ class "text-xs font-black text-slate-400 uppercase tracking-widest mb-1" ] [ text "Vestiaire" ]
+                                , div [ class "text-4xl font-black text-slate-800 group-hover:text-[#ea3a60] transition-colors" ] [ text (String.fromInt v) ]
+                                ]
                         )
-                    , div [ class "absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" ] [ text "▼" ]
-                    ]
-                ]
+                        vestiaires
+                    )
+
+            else
+                text ""
 
         _ ->
             text ""

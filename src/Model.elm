@@ -59,7 +59,7 @@ type UserContext
     = PourPatineur String
     | PourCoach (Set.Set String)
     | PourBuvette
-    | PourVestiaire Int
+    | PourVestiaire Int Bool
 
 
 type alias Model =
