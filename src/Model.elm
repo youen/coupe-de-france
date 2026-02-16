@@ -197,6 +197,68 @@ getHorairesCoach teamNames pl =
         |> List.sortWith (\a b -> compareViewCreneau a b)
 
 
+getHorairesVestiaire : Int -> List Creneau -> List ViewCreneau
+getHorairesVestiaire vNumber pl =
+    pl
+        |> List.filterMap
+            (\c ->
+                case c.activite of
+                    Passage details ->
+                        if details.numVestiaire == vNumber then
+                            Just details
+
+                        else
+                            Nothing
+
+                    _ ->
+                        Nothing
+            )
+        |> List.concatMap
+            (\details ->
+                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée", category = details.categorie }
+                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie", category = "" }
+                ]
+            )
+        |> List.sortWith (\a b -> compareViewCreneau a b)
+
+
+getVestiaires : List Creneau -> List Int
+getVestiaires pl =
+    pl
+        |> List.filterMap
+            (\c ->
+                case c.activite of
+                    Passage details ->
+                        Just details.numVestiaire
+
+                    _ ->
+                        Nothing
+            )
+        |> Set.fromList
+        |> Set.toList
+        |> List.sort
+
+
+estUnMomentChaud : Activite -> Bool
+estUnMomentChaud activite =
+    case activite of
+        Surfacage _ ->
+            True
+
+        Podium _ ->
+            True
+
+        _ ->
+            False
+
+
+getHorairesBuvette : List Creneau -> List ViewCreneau
+getHorairesBuvette pl =
+    pl
+        |> List.filter (\c -> estUnMomentChaud c.activite)
+        |> prepareViewData
+
+
 timeToMinutes : Time -> Int
 timeToMinutes { hour, minute } =
     hour * 60 + minute

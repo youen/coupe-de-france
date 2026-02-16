@@ -245,6 +245,48 @@ suite =
 
                     Nothing ->
                         Expect.fail "Should have results"
+        , test "getHorairesVestiaire returns times for a specific vestiaire" <|
+            \_ ->
+                let
+                    details1 =
+                        { nom = "ZEPHYR"
+                        , categorie = "ADULTE"
+                        , numVestiaire = 1
+                        , entreeVestiaire = { hour = 8, minute = 0 }
+                        , sortieVestiaire = { hour = 8, minute = 20 }
+                        , entreePiste = { hour = 8, minute = 22 }
+                        , sortiePiste = { hour = 8, minute = 30 }
+                        , sortieVestiaireDefinitive = { hour = 8, minute = 45 }
+                        }
+
+                    details2 =
+                        { nom = "TONNERRES"
+                        , categorie = "ADULTE"
+                        , numVestiaire = 2
+                        , entreeVestiaire = { hour = 7, minute = 30 }
+                        , sortieVestiaire = { hour = 7, minute = 50 }
+                        , entreePiste = { hour = 7, minute = 52 }
+                        , sortiePiste = { hour = 8, minute = 0 }
+                        , sortieVestiaireDefinitive = { hour = 8, minute = 15 }
+                        }
+
+                    planning =
+                        [ { heureDebut = { hour = 8, minute = 0 }, activite = Passage details1 }
+                        , { heureDebut = { hour = 7, minute = 30 }, activite = Passage details2 }
+                        ]
+
+                    vestiaireHoraires =
+                        getHorairesVestiaire 1 planning
+                in
+                Expect.equal (List.length vestiaireHoraires) 2
+        , test "estUnMomentChaud identifies rush moments" <|
+            \_ ->
+                Expect.all
+                    [ \_ -> Expect.equal (estUnMomentChaud (Surfacage 15)) True
+                    , \_ -> Expect.equal (estUnMomentChaud (Podium "P1")) True
+                    , \_ -> Expect.equal (estUnMomentChaud (Pause "P" 15)) False
+                    ]
+                    ()
         ]
 
 
