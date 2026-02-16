@@ -238,7 +238,7 @@ viewSelection model ctx =
             else
                 text ""
 
-        _ ->
+        PourBuvette ->
             text ""
 
 
@@ -285,8 +285,12 @@ viewPlanning model ctx =
         PourBuvette ->
             List.map viewBuvetteCreneau (getHorairesBuvette model.planning)
 
-        _ ->
-            []
+        PourVestiaire vNum _ ->
+            if vNum == 0 then
+                []
+
+            else
+                List.map viewCreneau (getHorairesVestiaire vNum model.planning)
 
 
 viewCreneau : ViewCreneau -> Html Msg
