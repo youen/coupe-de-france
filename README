@@ -1,0 +1,28 @@
+# CDF Synchro 2026 - Nantes
+
+Application de gestion et de consultation du planning pour la **Coupe de France de Patinage Synchronisé 2026**.
+
+## Contexte
+L'organisation d'une Coupe de France nécessite une coordination millimétrée entre la ressource principale (la glace), les ressources logistiques (les vestiaires) et les flux humains (équipes, coachs, bénévoles buvette). 
+
+Cette application vise à offrir une vue personnalisée selon le rôle de l'utilisateur pour réduire le stress lié au timing et assurer la fluidité de l'événement.
+
+## Objectifs
+- **Ressource Glace :** Centraliser le planning séquentiel (Entraînements, Compétition, Surfaçages).
+- **Vues Métiers :** - **Patineurs :** Focus sur les horaires de leur équipe.
+    - **Coachs :** Dashboard multi-équipes.
+    - **Logistique :** Impression des plannings de portes de vestiaires.
+    - **Buvette :** Anticipation des rushs lors des surfaçages et podiums.
+
+## Stack Technique
+- Langage : **Elm** (Zéro runtime exception, typage fort pour le métier).
+- Vite: https://vitejs.dev/ (pour le build et le dev server)
+- elm-spa: https://github.com/elm-spa/elm-spa (pour la gestion des routes)
+- pour la perssitance des données en local : https://github.com/elm-community/local-storage-port
+- pour les tests : https://github.com/elm-explorations/test
+- tailwindcss: https://tailwindcss.com/ (pour le style)
+- Format de données : **JSON** (initialisation statique).
+- publication : github pages
+
+## Comment lancer le projet
+
