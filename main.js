@@ -6,3 +6,7 @@ const app = Elm.Main.init({
     node: document.getElementById('app'),
     flags: planningData
 })
+
+app.ports.print.subscribe(function () {
+    window.print();
+});

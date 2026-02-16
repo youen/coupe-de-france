@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (Msg(..), main, update)
 
 import Browser
 import Html exposing (..)
@@ -19,9 +19,12 @@ type Msg
     = SelectEquipe String
     | ToggleEquipeCoach String
     | SelectVestiaire Int
-    | SetPrintMode Bool
+    | Print
     | SetContexte UserContext
     | ResetContexte
+
+
+port print : () -> Cmd msg
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
@@ -57,15 +60,10 @@ update msg model =
                     ( { model | contexte = Just (PourCoach (Set.singleton name)) }, Cmd.none )
 
         SelectVestiaire vNum ->
-            ( { model | contexte = Just (PourVestiaire vNum False) }, Cmd.none )
+            ( { model | contexte = Just (PourVestiaire vNum) }, Cmd.none )
 
-        SetPrintMode isPrint ->
-            case model.contexte of
-                Just (PourVestiaire vNum _) ->
-                    ( { model | contexte = Just (PourVestiaire vNum isPrint) }, Cmd.none )
-
-                _ ->
-                    ( model, Cmd.none )
+        Print ->
+            ( model, print () )
 
         SetContexte ctx ->
             ( { model | contexte = Just ctx }, Cmd.none )
@@ -81,16 +79,7 @@ view model =
             viewRoleSelection
 
         Just ctx ->
-            case ctx of
-                PourVestiaire n isPrint ->
-                    if isPrint && n > 0 then
-                        viewVestiairePrint model.planning n
-
-                    else
-                        viewStandardLayout model ctx
-
-                _ ->
-                    viewStandardLayout model ctx
+            viewStandardLayout model ctx
 
 
 viewRoleSelection : Html Msg
@@ -105,7 +94,7 @@ viewRoleSelection =
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
             [ roleButton "Patineur" (PourPatineur "") "⛸️" "Consultez vos horaires personnels"
             , roleButton "Coach" (PourCoach Set.empty) "📋" "Gérez plusieurs équipes simultanément"
-            , roleButton "Vestiaire" (PourVestiaire 0 False) "🚪" "Impression pour les portes des vestiaires"
+            , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Impression pour les portes des vestiaires"
             , roleButton "Buvette" PourBuvette "☕" "Anticipez les rushs de surfaçage"
             ]
         ]
@@ -130,16 +119,16 @@ viewStandardLayout : Model -> UserContext -> Html Msg
 viewStandardLayout model ctx =
     div [ class "min-h-screen bg-slate-50" ]
         [ -- Sticky Header
-          header [ class "sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3" ]
+          header [ class "sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 print:hidden" ]
             [ div [ class "max-w-4xl mx-auto flex items-center justify-between" ]
                 [ button [ class "flex items-center gap-2 text-slate-600 hover:text-[#ea3a60] font-bold transition-colors", onClick ResetContexte ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
                 , div [ class "flex items-center gap-4" ]
                     [ case ctx of
-                        PourVestiaire n _ ->
+                        PourVestiaire n ->
                             if n > 0 then
-                                button [ class "hidden md:flex items-center gap-2 px-4 py-1.5 bg-[#ea3a60] text-white rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95", onClick (SetPrintMode True) ]
-                                    [ text "🖨️ Mode Impression" ]
+                                button [ class "hidden md:flex items-center gap-2 px-4 py-1.5 bg-[#ea3a60] text-white rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95", onClick Print ]
+                                    [ text "🖨️ Imprimer le planning" ]
 
                             else
                                 text ""
@@ -151,39 +140,23 @@ viewStandardLayout model ctx =
                 ]
             ]
         , main_ [ class "max-w-4xl mx-auto p-4 md:p-6" ]
-            [ viewSelection model ctx
+            [ div [ class "hidden print:block mb-8" ]
+                [ case ctx of
+                    PourVestiaire n ->
+                        div [ class "text-center" ]
+                            [ h1 [ class "text-6xl font-black uppercase mb-2" ] [ text "VESTIAIRE" ]
+                            , div [ class "text-9xl font-black" ] [ text (String.fromInt n) ]
+                            ]
+
+                    _ ->
+                        text ""
+                ]
+            , div [ class "print:hidden" ] [ viewSelection model ctx ]
             , div [ class "space-y-4 pb-20" ]
                 (viewPlanning model ctx)
-            ]
-        ]
-
-
-viewVestiairePrint : List Creneau -> Int -> Html Msg
-viewVestiairePrint planning vNum =
-    div [ class "min-h-screen bg-white text-black p-10 font-sans print-page" ]
-        [ button [ class "print:hidden fixed top-6 left-6 flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold transition-all shadow-lg", onClick (SetPrintMode False) ]
-            [ text "← Mode Consultation" ]
-        , div [ class "max-w-4xl mx-auto border-[16px] border-black p-16 h-[277mm] flex flex-col justify-between" ]
-            [ div []
-                [ h1 [ class "text-9xl font-black mb-4 uppercase tracking-tighter text-center" ] [ text "VESTIAIRE" ]
-                , div [ class "text-[20rem] leading-none font-black text-center mb-20" ] [ text (String.fromInt vNum) ]
-                ]
-            , div [ class "space-y-10 flex-1 overflow-hidden" ]
-                (List.take 6 (List.map viewVestiaireItem (getHorairesVestiaire vNum planning)))
-            , div [ class "text-center text-4xl font-bold mt-10 border-t-8 border-black pt-10" ]
+            , div [ class "hidden print:block text-center text-2xl font-bold mt-10 border-t-4 border-black pt-8" ]
                 [ text "COUPE DE FRANCE 2026" ]
             ]
-        ]
-
-
-viewVestiaireItem : ViewCreneau -> Html Msg
-viewVestiaireItem item =
-    div [ class "flex items-center justify-between border-b-8 border-black pb-6" ]
-        [ div []
-            [ div [ class "text-6xl font-black uppercase mb-1" ] [ text item.name ]
-            , div [ class "text-4xl font-bold text-black/60" ] [ text item.category ]
-            ]
-        , div [ class "text-8xl font-mono font-black tabular-nums" ] [ text item.time ]
         ]
 
 
@@ -219,7 +192,7 @@ viewSelection model ctx =
                     (List.map (\eq -> viewCheckbox eq (Set.member eq set)) equipes)
                 ]
 
-        PourVestiaire vNum _ ->
+        PourVestiaire vNum ->
             if vNum == 0 then
                 div [ class "grid grid-cols-2 md:grid-cols-4 gap-4" ]
                     (List.map
@@ -285,7 +258,7 @@ viewPlanning model ctx =
         PourBuvette ->
             List.map viewBuvetteCreneau (getHorairesBuvette model.planning)
 
-        PourVestiaire vNum _ ->
+        PourVestiaire vNum ->
             if vNum == 0 then
                 []
 
