@@ -23,7 +23,7 @@
 @media print {
   @page {
     size: A4;
-    margin: 0;
+    margin: 10mm;
   }
 
   body {
@@ -32,13 +32,5 @@
 
   .print\:hidden {
     display: none !important;
-  }
-
-  .print-page {
-    width: 210mm;
-    height: 297mm;
-    padding: 10mm;
-    margin: 0;
-    box-shadow: none;
   }
 }
