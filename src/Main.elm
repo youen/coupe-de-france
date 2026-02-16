@@ -88,7 +88,7 @@ viewRoleSelection =
         [ div [ class "absolute -top-20 -left-20 w-64 h-64 bg-[#ea3a60]/5 rounded-full blur-3xl" ] []
         , div [ class "absolute -bottom-20 -right-20 w-96 h-96 bg-[#171717]/5 rounded-full blur-3xl" ] []
         , div [ class "z-10 text-center mb-12" ]
-            [ h1 [ class "text-6xl font-black gradient-text mb-4 tracking-tight" ] [ text "CDF 2026" ]
+            [ h1 [ class "text-6xl font-black gradient-text mb-4 tracking-tight" ] [ text "CDF Synchro 2026" ]
             , p [ class "text-[#1d1d1d] font-medium opacity-60" ] [ text "Choisissez votre accès au planning" ]
             ]
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
