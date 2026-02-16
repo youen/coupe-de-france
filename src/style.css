@@ -2,18 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --ll-pink: #ea3a60;
+  --ll-pink-dark: #ea0032;
+  --ll-dark: #171717;
+  --ll-bg: #ffffff;
+  --text-dark: #1d1d1d;
+}
+
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-white text-[#1d1d1d] antialiased;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Montserrat', sans-serif;
   }
 }
 
-.glass {
-  @apply bg-white/70 backdrop-blur-md border border-white/20;
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#ea3a60] to-[#ea0032];
 }
 
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#ea3a60] to-[#ff6b81];
+.btn-primary {
+  @apply bg-[#ea3a60] text-white rounded-[15px] px-5 py-2.5 font-bold transition-all hover:bg-[#ea0032] active:scale-95 shadow-lg shadow-[#ea3a60]/20;
 }
 
 .card-hover {

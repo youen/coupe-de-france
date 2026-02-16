@@ -84,12 +84,12 @@ view model =
 
 viewRoleSelection : Html Msg
 viewRoleSelection =
-    div [ class "min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans" ]
-        [ div [ class "absolute -top-20 -left-20 w-64 h-64 bg-[#ea3a60]/10 rounded-full blur-3xl" ] []
-        , div [ class "absolute -bottom-20 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" ] []
+    div [ class "min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden" ]
+        [ div [ class "absolute -top-20 -left-20 w-64 h-64 bg-[#ea3a60]/5 rounded-full blur-3xl" ] []
+        , div [ class "absolute -bottom-20 -right-20 w-96 h-96 bg-[#171717]/5 rounded-full blur-3xl" ] []
         , div [ class "z-10 text-center mb-12" ]
-            [ h1 [ class "text-5xl font-black gradient-text mb-4 tracking-tight" ] [ text "CDF Synchro 2026" ]
-            , p [ class "text-slate-500 font-medium" ] [ text "Choisissez votre accès au planning" ]
+            [ h1 [ class "text-6xl font-black gradient-text mb-4 tracking-tight" ] [ text "CDF 2026" ]
+            , p [ class "text-[#1d1d1d] font-medium opacity-60" ] [ text "Choisissez votre accès au planning" ]
             ]
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
             [ roleButton "Patineur" (PourPatineur "") "⛸️" "Consultez vos horaires personnels"
@@ -103,15 +103,15 @@ viewRoleSelection =
 roleButton : String -> UserContext -> String -> String -> Html Msg
 roleButton label ctx icon desc =
     button
-        [ class "group relative flex items-center p-6 bg-white border border-slate-200 rounded-3xl transition-all duration-300 hover:border-[#ea3a60] hover:shadow-2xl hover:shadow-[#ea3a60]/10 active:scale-95 overflow-hidden"
+        [ class "group relative flex items-center p-6 bg-white border border-slate-100 rounded-3xl transition-all duration-300 hover:border-[#ea3a60] hover:shadow-2xl hover:shadow-[#ea3a60]/5 active:scale-95 overflow-hidden"
         , onClick (SetContexte ctx)
         ]
         [ div [ class "flex-shrink-0 w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl group-hover:bg-[#ea3a60]/10 transition-colors mr-6" ] [ text icon ]
         , div [ class "text-left" ]
-            [ div [ class "text-xl font-bold text-slate-800" ] [ text label ]
-            , div [ class "text-sm text-slate-500" ] [ text desc ]
+            [ div [ class "text-xl font-bold text-[#1d1d1d]" ] [ text label ]
+            , div [ class "text-sm text-slate-400" ] [ text desc ]
             ]
-        , div [ class "absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" ] []
+        , div [ class "absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-transparent to-slate-50/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" ] []
         ]
 
 
@@ -132,25 +132,25 @@ viewStandardLayout model ctx =
                 PourBuvette ->
                     "context-buvette"
     in
-    div [ class ("min-h-screen bg-slate-50 print:bg-white print:min-h-0 print:p-[10mm] " ++ contextClass) ]
+    div [ class ("min-h-screen bg-white print:p-[10mm] " ++ contextClass) ]
         [ -- Sticky Header
-          header [ class "sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 print:hidden" ]
+          header [ class "sticky top-0 z-30 bg-[#171717] border-b border-black/10 px-4 py-3 shadow-xl print:hidden" ]
             [ div [ class "max-w-4xl mx-auto flex items-center justify-between" ]
-                [ button [ class "flex items-center gap-2 text-slate-600 hover:text-[#ea3a60] font-bold transition-colors", onClick ResetContexte ]
+                [ button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick ResetContexte ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
                 , div [ class "flex items-center gap-4" ]
                     [ case ctx of
                         PourVestiaire n ->
                             if n > 0 then
-                                button [ class "hidden md:flex items-center gap-2 px-4 py-1.5 bg-[#ea3a60] text-white rounded-full font-bold text-sm transition-all hover:scale-105 active:scale-95", onClick Print ]
-                                    [ text "🖨️ Imprimer le planning" ]
+                                button [ class "btn-primary !py-1 text-xs", onClick Print ]
+                                    [ text "🖨️ IMPRIMER" ]
 
                             else
                                 text ""
 
                         _ ->
                             text ""
-                    , div [ class "font-black text-xl gradient-text" ] [ text "CDF 2026" ]
+                    , div [ class "font-black text-xl text-[#ea3a60] tracking-tighter" ] [ text "CDF 2026" ]
                     ]
                 ]
             ]
@@ -188,7 +188,7 @@ viewSelection model ctx =
                 [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-3" ] [ text "Équipe" ]
                 , div [ class "relative" ]
                     [ select
-                        [ class "block w-full text-lg font-bold p-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-[#ea3a60] appearance-none cursor-pointer"
+                        [ class "block w-full text-lg font-bold p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#ea3a60] appearance-none cursor-pointer text-[#1d1d1d]"
                         , onChange SelectEquipe
                         ]
                         (option [ value "" ] [ text "-- Choisissez votre équipe --" ]
@@ -211,11 +211,11 @@ viewSelection model ctx =
                     (List.map
                         (\v ->
                             button
-                                [ class "p-8 bg-white border-2 border-slate-100 rounded-3xl hover:border-[#ea3a60] transition-all group active:scale-95 shadow-sm"
+                                [ class "p-8 bg-white border border-slate-100 rounded-3xl hover:border-[#ea3a60] transition-all group active:scale-95 shadow-sm"
                                 , onClick (SelectVestiaire v)
                                 ]
                                 [ div [ class "text-xs font-black text-slate-400 uppercase tracking-widest mb-1" ] [ text "Vestiaire" ]
-                                , div [ class "text-4xl font-black text-slate-800 group-hover:text-[#ea3a60] transition-colors" ] [ text (String.fromInt v) ]
+                                , div [ class "text-4xl font-black text-[#1d1d1d] group-hover:text-[#ea3a60] transition-colors" ] [ text (String.fromInt v) ]
                                 ]
                         )
                         vestiaires
@@ -237,7 +237,7 @@ viewCheckbox name isChecked =
                         "bg-[#ea3a60] text-white border-[#ea3a60]"
 
                     else
-                        "bg-gray-50 text-gray-700"
+                        "bg-white text-gray-700 border-slate-100"
                    )
             )
         ]
@@ -282,18 +282,33 @@ viewPlanning model ctx =
 
 viewCreneau : ViewCreneau -> Html Msg
 viewCreneau creneau =
-    div [ class "group flex items-center gap-6 p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b print:border-slate-100 print:rounded-none print:p-0.5 print:gap-2" ]
+    let
+        isSurfacage =
+            String.contains "Surfaçage" creneau.name
+
+        baseClass =
+            "group flex items-center gap-6 p-5 bg-white border rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b print:rounded-none print:p-0.5 print:gap-2 "
+
+        borderClass =
+            if isSurfacage then
+                "border-[#ea3a60] border-4 print:border-black"
+
+            else
+                "border-slate-100 print:border-slate-100"
+    in
+    div [ class (baseClass ++ borderClass) ]
         [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-12 print:pr-1" ]
-            [ div [ class "text-xl font-black text-slate-800 font-mono tracking-tight print:text-sm" ] [ text creneau.time ]
+            [ div [ class "text-xl font-black text-[#1d1d1d] font-mono tracking-tight print:text-sm" ] [ text creneau.time ]
             , div [ class "text-[10px] font-black text-slate-400 uppercase tracking-widest print:hidden" ] [ text "Heure" ]
             ]
         , div [ class "flex-1 flex items-baseline gap-2 overflow-hidden" ]
-            [ div [ class "font-black text-slate-800 text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-sm print:truncate" ] [ text creneau.name ]
+            [ div [ class "font-black text-[#1d1d1d] text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-sm print:truncate" ]
+                [ text (String.toUpper creneau.name) ]
             , if String.isEmpty creneau.category then
                 text ""
 
               else
-                span [ class "inline-block px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-[10px] print:bg-transparent print:p-0 print:italic print:font-medium" ] [ text ("(" ++ creneau.category ++ ")") ]
+                span [ class "inline-block px-2 py-0.5 bg-slate-50 text-slate-400 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-[10px] print:bg-transparent print:p-0 print:italic print:font-medium" ] [ text ("(" ++ creneau.category ++ ")") ]
             ]
         , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors print:hidden" ] []
         ]
