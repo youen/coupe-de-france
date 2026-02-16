@@ -109,6 +109,19 @@ type alias ViewCreneau =
     }
 
 
+type alias VestiairePassage =
+    { nom : String
+    , entree : String
+    , sortie : String
+    }
+
+
+type alias VestiaireCategorie =
+    { nom : String
+    , passages : List VestiairePassage
+    }
+
+
 prepareViewData : List Creneau -> List ViewCreneau
 prepareViewData pl =
     pl
@@ -220,6 +233,49 @@ getHorairesVestiaire vNumber pl =
                 ]
             )
         |> List.sortWith (\a b -> compareViewCreneau a b)
+
+
+getHorairesVestiaireGrouped : Int -> List Creneau -> List VestiaireCategorie
+getHorairesVestiaireGrouped vNumber pl =
+    let
+        passages =
+            pl
+                |> List.filterMap
+                    (\c ->
+                        case c.activite of
+                            Passage details ->
+                                if details.numVestiaire == vNumber then
+                                    Just details
+
+                                else
+                                    Nothing
+
+                            _ ->
+                                Nothing
+                    )
+                |> List.sortWith (\a b -> compare (timeToMinutes a.entreeVestiaire) (timeToMinutes b.entreeVestiaire))
+
+        foldFn p acc =
+            let
+                vp =
+                    { nom = p.nom
+                    , entree = formatTime p.entreeVestiaire
+                    , sortie = formatTime p.sortieVestiaire
+                    }
+            in
+            case acc of
+                [] ->
+                    [ { nom = p.categorie, passages = [ vp ] } ]
+
+                cat :: rest ->
+                    if cat.nom == p.categorie then
+                        { cat | passages = cat.passages ++ [ vp ] } :: rest
+
+                    else
+                        { nom = p.categorie, passages = [ vp ] } :: acc
+    in
+    List.foldl foldFn [] passages
+        |> List.reverse
 
 
 getVestiaires : List Creneau -> List Int

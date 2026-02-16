@@ -287,6 +287,52 @@ suite =
                     , \_ -> Expect.equal (estUnMomentChaud (Pause "P" 15)) False
                     ]
                     ()
+        , test "getHorairesVestiaireGrouped groups by category" <|
+            \_ ->
+                let
+                    details1 =
+                        { nom = "ZEPHYR"
+                        , categorie = "ADULTE"
+                        , numVestiaire = 1
+                        , entreeVestiaire = { hour = 8, minute = 0 }
+                        , sortieVestiaire = { hour = 8, minute = 20 }
+                        , entreePiste = { hour = 0, minute = 0 }
+                        , sortiePiste = { hour = 0, minute = 0 }
+                        , sortieVestiaireDefinitive = { hour = 0, minute = 0 }
+                        }
+
+                    details2 =
+                        { nom = "BRISE"
+                        , categorie = "ADULTE"
+                        , numVestiaire = 1
+                        , entreeVestiaire = { hour = 9, minute = 0 }
+                        , sortieVestiaire = { hour = 9, minute = 20 }
+                        , entreePiste = { hour = 0, minute = 0 }
+                        , sortiePiste = { hour = 0, minute = 0 }
+                        , sortieVestiaireDefinitive = { hour = 0, minute = 0 }
+                        }
+
+                    details3 =
+                        { nom = "PETIT"
+                        , categorie = "PREPA"
+                        , numVestiaire = 1
+                        , entreeVestiaire = { hour = 10, minute = 0 }
+                        , sortieVestiaire = { hour = 10, minute = 20 }
+                        , entreePiste = { hour = 0, minute = 0 }
+                        , sortiePiste = { hour = 0, minute = 0 }
+                        , sortieVestiaireDefinitive = { hour = 0, minute = 0 }
+                        }
+
+                    planning =
+                        [ { heureDebut = { hour = 8, minute = 0 }, activite = Passage details1 }
+                        , { heureDebut = { hour = 9, minute = 0 }, activite = Passage details2 }
+                        , { heureDebut = { hour = 10, minute = 0 }, activite = Passage details3 }
+                        ]
+
+                    grouped =
+                        getHorairesVestiaireGrouped 1 planning
+                in
+                Expect.equal (List.length grouped) 2
         ]
 
 
