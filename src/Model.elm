@@ -1,6 +1,7 @@
 module Model exposing (..)
 
 import Json.Decode as Decode exposing (Decoder)
+import Set
 
 
 
@@ -56,7 +57,7 @@ type alias Creneau =
 
 type UserContext
     = PourPatineur String
-    | PourCoach (List String)
+    | PourCoach (Set.Set String)
     | PourBuvette
     | PourVestiaire Int
 
@@ -99,6 +100,121 @@ getActiviteInfo activite =
 
         Podium nom ->
             { nom = nom, categorie = "" }
+
+
+type alias ViewCreneau =
+    { time : String
+    , name : String
+    , category : String
+    }
+
+
+prepareViewData : List Creneau -> List ViewCreneau
+prepareViewData pl =
+    pl
+        |> List.map
+            (\c ->
+                let
+                    info =
+                        getActiviteInfo c.activite
+                in
+                { time = formatTime c.heureDebut
+                , name = info.nom
+                , category = info.categorie
+                }
+            )
+
+
+getEquipes : List Creneau -> List String
+getEquipes pl =
+    pl
+        |> List.filterMap
+            (\c ->
+                case c.activite of
+                    Passage details ->
+                        Just details.nom
+
+                    _ ->
+                        Nothing
+            )
+        |> Set.fromList
+        |> Set.toList
+        |> List.sort
+
+
+getHorairesPatineur : String -> List Creneau -> List ViewCreneau
+getHorairesPatineur teamName pl =
+    pl
+        |> List.filterMap
+            (\c ->
+                case c.activite of
+                    Passage details ->
+                        if details.nom == teamName then
+                            Just details
+
+                        else
+                            Nothing
+
+                    _ ->
+                        Nothing
+            )
+        |> List.concatMap
+            (\details ->
+                [ { time = formatTime details.entreeVestiaire, name = "Entrée Vestiaire", category = "Vestiaire " ++ String.fromInt details.numVestiaire }
+                , { time = formatTime details.sortieVestiaire, name = "Sortie Vestiaire", category = "" }
+                , { time = formatTime details.entreePiste, name = "Entrée Piste", category = details.categorie }
+                , { time = formatTime details.sortiePiste, name = "Sortie Piste", category = "" }
+                , { time = formatTime details.sortieVestiaireDefinitive, name = "Sortie Vestiaire Définitive", category = "" }
+                ]
+            )
+
+
+getHorairesCoach : Set.Set String -> List Creneau -> List ViewCreneau
+getHorairesCoach teamNames pl =
+    pl
+        |> List.filterMap
+            (\c ->
+                case c.activite of
+                    Passage details ->
+                        if Set.member details.nom teamNames then
+                            Just details
+
+                        else
+                            Nothing
+
+                    _ ->
+                        Nothing
+            )
+        |> List.concatMap
+            (\details ->
+                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée V", category = "Vestiaire " ++ String.fromInt details.numVestiaire }
+                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie V", category = "" }
+                , { time = formatTime details.entreePiste, name = details.nom ++ " - Entrée Piste", category = details.categorie }
+                , { time = formatTime details.sortiePiste, name = details.nom ++ " - Sortie Piste", category = "" }
+                , { time = formatTime details.sortieVestiaireDefinitive, name = details.nom ++ " - Sortie V Déf", category = "" }
+                ]
+            )
+        |> List.sortWith (\a b -> compareViewCreneau a b)
+
+
+timeToMinutes : Time -> Int
+timeToMinutes { hour, minute } =
+    hour * 60 + minute
+
+
+compareViewCreneau : ViewCreneau -> ViewCreneau -> Order
+compareViewCreneau a b =
+    compare (viewCreneauToMinutes a) (viewCreneauToMinutes b)
+
+
+viewCreneauToMinutes : ViewCreneau -> Int
+viewCreneauToMinutes v =
+    case String.split ":" v.time of
+        [ h, m ] ->
+            (String.toInt h |> Maybe.withDefault 0) * 60 + (String.toInt m |> Maybe.withDefault 0)
+
+        _ ->
+            0
 
 
 
