@@ -97,4 +97,29 @@ suite =
                         { hour = 14, minute = 5 }
                 in
                 Expect.equal (formatTime time) "14:05"
+        , test "getActiviteInfo for Surfaçage" <|
+            \_ ->
+                let
+                    info =
+                        getActiviteInfo (Surfacage 15)
+                in
+                Expect.equal info { nom = "Surfaçage", categorie = "" }
+        , test "getActiviteInfo for Passage" <|
+            \_ ->
+                let
+                    details =
+                        { nom = "ZEPHYR"
+                        , categorie = "ADULTE"
+                        , numVestiaire = 1
+                        , entreeVestiaire = { hour = 7, minute = 38 }
+                        , sortieVestiaire = { hour = 7, minute = 58 }
+                        , entreePiste = { hour = 8, minute = 0 }
+                        , sortiePiste = { hour = 8, minute = 8 }
+                        , sortieVestiaireDefinitive = { hour = 8, minute = 23 }
+                        }
+
+                    info =
+                        getActiviteInfo (Passage details)
+                in
+                Expect.equal info { nom = "ZEPHYR", categorie = "ADULTE" }
         ]

@@ -79,6 +79,28 @@ formatTime { hour, minute } =
     h ++ ":" ++ m
 
 
+type alias ActiviteInfo =
+    { nom : String
+    , categorie : String
+    }
+
+
+getActiviteInfo : Activite -> ActiviteInfo
+getActiviteInfo activite =
+    case activite of
+        Surfacage _ ->
+            { nom = "Surfaçage", categorie = "" }
+
+        Passage details ->
+            { nom = details.nom, categorie = details.categorie }
+
+        Pause nom _ ->
+            { nom = nom, categorie = "" }
+
+        Podium nom ->
+            { nom = nom, categorie = "" }
+
+
 
 -- Decoder implementation
 
