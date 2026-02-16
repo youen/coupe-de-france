@@ -301,22 +301,28 @@ viewCreneau creneau =
 
 viewVestiaireCategorie : VestiaireCategorie -> List (Html Msg)
 viewVestiaireCategorie cat =
-    div [ class "flex items-center gap-4 my-6 print:my-2" ]
-        [ div [ class "flex-1 h-px bg-slate-200 print:bg-black" ] []
-        , div [ class "text-xs font-black uppercase text-slate-400 print:text-black tracking-[0.2em] print:text-[10px]" ] [ text cat.nom ]
-        , div [ class "flex-1 h-px bg-slate-200 print:bg-black" ] []
+    div [ class "mt-10 mb-6 first:mt-0 print:mt-4 print:mb-2" ]
+        [ div [ class "inline-block px-4 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg print:bg-black print:rounded-none print:px-2" ]
+            [ text cat.nom ]
+        , div [ class "h-0.5 bg-slate-800 w-full mt-1 print:bg-black" ] []
         ]
         :: List.map viewVestiairePassage cat.passages
 
 
 viewVestiairePassage : VestiairePassage -> Html Msg
 viewVestiairePassage p =
-    div [ class "flex items-center justify-between p-4 bg-white border border-slate-100 rounded-3xl shadow-sm mb-3 print:shadow-none print:border-none print:p-0.5 print:mb-0" ]
-        [ div [ class "flex-1 font-bold text-slate-800 print:text-sm" ] [ text p.nom ]
-        , div [ class "flex items-center gap-2 font-mono text-slate-500 print:text-xs print:text-black font-medium" ]
-            [ text p.entree
-            , span [ class "text-slate-300 print:text-black" ] [ text "--->" ]
-            , text p.sortie
+    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-3 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-none print:p-0 print:mb-0 print:pt-1" ]
+        [ div [ class "flex-1 font-bold text-slate-800 print:text-[13px] print:font-black uppercase" ] [ text p.nom ]
+        , div [ class "flex items-center gap-3 font-mono text-slate-500 print:text-xs print:text-black font-bold" ]
+            [ div [ class "flex flex-col items-center" ]
+                [ span [ class "text-[8px] text-slate-400 uppercase font-sans print:hidden" ] [ text "In" ]
+                , text p.entree
+                ]
+            , span [ class "px-2 text-slate-300 print:text-black font-sans" ] [ text "–" ]
+            , div [ class "flex flex-col items-center" ]
+                [ span [ class "text-[8px] text-slate-400 uppercase font-sans print:hidden" ] [ text "Out" ]
+                , text p.sortie
+                ]
             ]
         ]
 
