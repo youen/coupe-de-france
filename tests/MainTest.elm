@@ -1,7 +1,6 @@
 module MainTest exposing (..)
 
 import Expect
-import Json.Decode as Decode
 import Main
 import Model exposing (UserContext(..))
 import Test exposing (..)

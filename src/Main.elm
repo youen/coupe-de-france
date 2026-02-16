@@ -117,7 +117,22 @@ roleButton label ctx icon desc =
 
 viewStandardLayout : Model -> UserContext -> Html Msg
 viewStandardLayout model ctx =
-    div [ class "min-h-screen bg-slate-50" ]
+    let
+        contextClass =
+            case ctx of
+                PourVestiaire _ ->
+                    "context-vestiaire"
+
+                PourPatineur _ ->
+                    "context-patineur"
+
+                PourCoach _ ->
+                    "context-coach"
+
+                PourBuvette ->
+                    "context-buvette"
+    in
+    div [ class ("min-h-screen bg-slate-50 print:bg-white print:min-h-0 " ++ contextClass) ]
         [ -- Sticky Header
           header [ class "sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 print:hidden" ]
             [ div [ class "max-w-4xl mx-auto flex items-center justify-between" ]
@@ -139,13 +154,13 @@ viewStandardLayout model ctx =
                     ]
                 ]
             ]
-        , main_ [ class "max-w-4xl mx-auto p-4 md:p-6" ]
-            [ div [ class "hidden print:block mb-8" ]
+        , main_ [ class "max-w-4xl mx-auto p-4 md:p-6 print:p-0 print:max-w-none" ]
+            [ div [ class "hidden print:block mb-12" ]
                 [ case ctx of
                     PourVestiaire n ->
-                        div [ class "text-center" ]
-                            [ h1 [ class "text-6xl font-black uppercase mb-2" ] [ text "VESTIAIRE" ]
-                            , div [ class "text-9xl font-black" ] [ text (String.fromInt n) ]
+                        div [ class "text-center border-[12px] border-black p-12 mb-8" ]
+                            [ h1 [ class "text-8xl font-black uppercase mb-4 tracking-tighter" ] [ text "VESTIAIRE" ]
+                            , div [ class "text-[15rem] leading-none font-black" ] [ text (String.fromInt n) ]
                             ]
 
                     _ ->
@@ -268,20 +283,20 @@ viewPlanning model ctx =
 
 viewCreneau : ViewCreneau -> Html Msg
 viewCreneau creneau =
-    div [ class "group flex items-center gap-6 p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300" ]
-        [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6" ]
-            [ div [ class "text-xl font-black text-slate-800 font-mono tracking-tight" ] [ text creneau.time ]
-            , div [ class "text-[10px] font-black text-slate-400 uppercase tracking-widest" ] [ text "Heure" ]
+    div [ class "group flex items-center gap-6 p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b-2 print:border-slate-200 print:rounded-none print:p-4" ]
+        [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-32 print:pr-10" ]
+            [ div [ class "text-xl font-black text-slate-800 font-mono tracking-tight print:text-5xl" ] [ text creneau.time ]
+            , div [ class "text-[10px] font-black text-slate-400 uppercase tracking-widest print:text-base" ] [ text "Heure" ]
             ]
         , div [ class "flex-1" ]
-            [ div [ class "font-black text-slate-800 text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors" ] [ text creneau.name ]
+            [ div [ class "font-black text-slate-800 text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-5xl" ] [ text creneau.name ]
             , if String.isEmpty creneau.category then
                 text ""
 
               else
-                div [ class "inline-block px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider" ] [ text creneau.category ]
+                div [ class "inline-block px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-2xl print:bg-transparent print:p-0 print:mt-2" ] [ text creneau.category ]
             ]
-        , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors" ] []
+        , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors print:hidden" ] []
         ]
 
 
