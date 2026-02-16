@@ -276,7 +276,8 @@ viewPlanning model ctx =
                 []
 
             else
-                List.map viewCreneau (getHorairesVestiaire vNum model.planning)
+                getHorairesVestiaireGrouped vNum model.planning
+                    |> List.concatMap viewVestiaireCategorie
 
 
 viewCreneau : ViewCreneau -> Html Msg
@@ -295,6 +296,28 @@ viewCreneau creneau =
                 span [ class "inline-block px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-[10px] print:bg-transparent print:p-0 print:italic print:font-medium" ] [ text ("(" ++ creneau.category ++ ")") ]
             ]
         , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors print:hidden" ] []
+        ]
+
+
+viewVestiaireCategorie : VestiaireCategorie -> List (Html Msg)
+viewVestiaireCategorie cat =
+    div [ class "flex items-center gap-4 my-6 print:my-2" ]
+        [ div [ class "flex-1 h-px bg-slate-200 print:bg-black" ] []
+        , div [ class "text-xs font-black uppercase text-slate-400 print:text-black tracking-[0.2em] print:text-[10px]" ] [ text cat.nom ]
+        , div [ class "flex-1 h-px bg-slate-200 print:bg-black" ] []
+        ]
+        :: List.map viewVestiairePassage cat.passages
+
+
+viewVestiairePassage : VestiairePassage -> Html Msg
+viewVestiairePassage p =
+    div [ class "flex items-center justify-between p-4 bg-white border border-slate-100 rounded-3xl shadow-sm mb-3 print:shadow-none print:border-none print:p-0.5 print:mb-0" ]
+        [ div [ class "flex-1 font-bold text-slate-800 print:text-sm" ] [ text p.nom ]
+        , div [ class "flex items-center gap-2 font-mono text-slate-500 print:text-xs print:text-black font-medium" ]
+            [ text p.entree
+            , span [ class "text-slate-300 print:text-black" ] [ text "--->" ]
+            , text p.sortie
+            ]
         ]
 
 
