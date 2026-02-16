@@ -155,12 +155,12 @@ viewStandardLayout model ctx =
                 ]
             ]
         , main_ [ class "max-w-4xl mx-auto p-4 md:p-6 print:p-0 print:max-w-full" ]
-            [ div [ class "hidden print:block mb-4" ]
+            [ div [ class "hidden print:block mb-2" ]
                 [ case ctx of
                     PourVestiaire n ->
-                        div [ class "text-center border-4 border-black p-4 mb-4" ]
-                            [ h1 [ class "text-2xl font-black uppercase mb-1 tracking-tighter" ] [ text "VESTIAIRE" ]
-                            , div [ class "text-5xl leading-none font-black" ] [ text (String.fromInt n) ]
+                        div [ class "text-center border-2 border-black p-2 mb-2" ]
+                            [ h1 [ class "text-lg font-black uppercase tracking-tighter inline-block mr-2" ] [ text "VESTIAIRE" ]
+                            , div [ class "text-2xl font-black inline-block" ] [ text (String.fromInt n) ]
                             ]
 
                     _ ->
@@ -169,8 +169,6 @@ viewStandardLayout model ctx =
             , div [ class "print:hidden" ] [ viewSelection model ctx ]
             , div [ class "space-y-4 print:space-y-0.5 pb-20 print:pb-0" ]
                 (viewPlanning model ctx)
-            , div [ class "hidden print:block text-center text-2xl font-bold mt-10 border-t-4 border-black pt-8" ]
-                [ text "COUPE DE FRANCE 2026" ]
             ]
         ]
 
@@ -283,18 +281,18 @@ viewPlanning model ctx =
 
 viewCreneau : ViewCreneau -> Html Msg
 viewCreneau creneau =
-    div [ class "group flex items-center gap-6 p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b print:border-slate-100 print:rounded-none print:p-1 print:gap-2" ]
-        [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-16 print:pr-2" ]
-            [ div [ class "text-xl font-black text-slate-800 font-mono tracking-tight print:text-base" ] [ text creneau.time ]
+    div [ class "group flex items-center gap-6 p-5 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b print:border-slate-100 print:rounded-none print:p-0.5 print:gap-2" ]
+        [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-12 print:pr-1" ]
+            [ div [ class "text-xl font-black text-slate-800 font-mono tracking-tight print:text-sm" ] [ text creneau.time ]
             , div [ class "text-[10px] font-black text-slate-400 uppercase tracking-widest print:hidden" ] [ text "Heure" ]
             ]
-        , div [ class "flex-1" ]
-            [ div [ class "font-black text-slate-800 text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-base" ] [ text creneau.name ]
+        , div [ class "flex-1 flex items-baseline gap-2 overflow-hidden" ]
+            [ div [ class "font-black text-slate-800 text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-sm print:truncate" ] [ text creneau.name ]
             , if String.isEmpty creneau.category then
                 text ""
 
               else
-                div [ class "inline-block px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-xs print:bg-transparent print:p-0 print:ml-1" ] [ text creneau.category ]
+                span [ class "inline-block px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-[10px] print:bg-transparent print:p-0 print:italic print:font-medium" ] [ text ("(" ++ creneau.category ++ ")") ]
             ]
         , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors print:hidden" ] []
         ]
