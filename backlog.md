@@ -53,3 +53,46 @@
     En tant que utilisateur en bord de piste, je veux que les couleurs respectent le contraste #ea3a60 sur blanc afin de pouvoir lire mon horaire même avec les reflets de la glace sur mon téléphone.
 
     Critères : Boutons de rôle en plein écran, police Poppins taille 16px minimum (conforme au CSS du site).
+
+
+
+
+## ⏱️ Phase 5 : Dynamisme et "Live"
+
+**US8 : Rafraîchissement automatique du temps**
+
+* **En tant qu'** utilisateur, **je veux** que l'application mette à jour le décompte avant chaque événement toutes les minutes **afin de** ne pas avoir à rafraîchir la page manuellement.
+* **Critères :** Utilisation de `Time.every 60000 Tick`. Calcul du temps restant entre `maintenant` et `heure_piste`.
+* **Évolution Modèle :** Ajout de `currentTime : Posix` dans le modèle.
+
+**US9 : Cycle de vie visuel des événements (Passé/Présent/Futur)**
+
+* **En tant qu'** utilisateur, **je veux** que les événements passés changent d'apparence avant de disparaître **afin de** distinguer visuellement ce qui est terminé de ce qui arrive.
+* **Critères :** * *Futur :* Style normal (Rose `#ea3a60`).
+* *Terminé :* Opacité réduite (ex: 40%) ou passage en gris pendant 20 minutes.
+* *Disparition :* Masquage automatique 20 minutes après la `fin_v` (sortie vestiaire).
+
+
+* **Évolution Modèle :** Logique de filtrage dans la `view` : `List.filter (\c -> estEncorePertinent c currentTime)`.
+
+---
+
+## 🧪 Phase 6 : Test et Simulation
+
+**US10 : Mode "Time Travel" (Démo)**
+
+* **En tant que** testeur/développeur, **je veux** pouvoir activer un curseur temporel **afin de** simuler l'avancement de la journée et vérifier le comportement de l'interface.
+* **Critères :** * Un interrupteur "Mode Démo".
+* Un slider qui modifie le `currentTime` du modèle de 07h00 à 20h00.
+* Une fois activé, l'application ignore l'heure réelle du système.
+
+
+* **Évolution Modèle :** ```elm
+type alias Model = {
+planning : List Creneau,
+currentTime : Posix,
+isDemoMode : Bool,
+demoTimeOffset : Int -- minutes ajoutées ou heure forcée
+}
+```
+

@@ -333,6 +333,56 @@ suite =
                         getHorairesVestiaireGrouped 1 planning
                 in
                 Expect.equal (List.length grouped) 2
+        , describe "US9: estEncorePertinent"
+            [ test "Passage is relevant before it starts" <|
+                \_ ->
+                    let
+                        creneau =
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+
+                        currentTimeMinutes =
+                            8 * 60
+
+                        -- 08:00
+                    in
+                    Expect.equal (estEncorePertinent creneau currentTimeMinutes) True
+            , test "Passage is relevant during activity" <|
+                \_ ->
+                    let
+                        creneau =
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+
+                        currentTimeMinutes =
+                            10 * 60 + 5
+
+                        -- 10:05
+                    in
+                    Expect.equal (estEncorePertinent creneau currentTimeMinutes) True
+            , test "Passage is relevant up to 20 mins after fin_v" <|
+                \_ ->
+                    let
+                        creneau =
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+
+                        currentTimeMinutes =
+                            10 * 60 + 30 + 19
+
+                        -- 10:49
+                    in
+                    Expect.equal (estEncorePertinent creneau currentTimeMinutes) True
+            , test "Passage is NOT relevant 21 mins after fin_v" <|
+                \_ ->
+                    let
+                        creneau =
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+
+                        currentTimeMinutes =
+                            10 * 60 + 30 + 21
+
+                        -- 10:51
+                    in
+                    Expect.equal (estEncorePertinent creneau currentTimeMinutes) False
+            ]
         ]
 
 

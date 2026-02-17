@@ -4,6 +4,7 @@ import Expect
 import Main
 import Model exposing (UserContext(..))
 import Test exposing (..)
+import Time
 
 
 suite : Test
@@ -16,6 +17,10 @@ suite =
                         initialModel =
                             { planning = []
                             , contexte = Just (PourVestiaire 1)
+                            , currentTime = Time.millisToPosix 0
+                            , zone = Time.utc
+                            , isDemoMode = False
+                            , demoTimeMinutes = 420
                             }
 
                         -- This is a placeholder since we can't easily test Cmd.none vs Cmd port

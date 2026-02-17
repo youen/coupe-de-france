@@ -3,16 +3,12 @@ port module Main exposing (Msg(..), main, update)
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onCheck)
+import Html.Events exposing (onCheck, onInput)
 import Json.Decode as Decode
 import Model exposing (..)
 import Set
-
-
-type alias Model =
-    { planning : List Creneau
-    , contexte : Maybe UserContext
-    }
+import Task
+import Time
 
 
 type Msg
@@ -22,6 +18,10 @@ type Msg
     | Print
     | SetContexte UserContext
     | ResetContexte
+    | Tick Time.Posix
+    | AdjustTimeZone Time.Zone
+    | SetDemoMode Bool
+    | SetDemoTime Int
 
 
 port print : () -> Cmd msg
@@ -34,7 +34,9 @@ init flags =
             Decode.decodeValue rootDecoder flags
                 |> Result.withDefault []
     in
-    ( { planning = decodedPlanning, contexte = Nothing }, Cmd.none )
+    ( { planning = decodedPlanning, contexte = Nothing, currentTime = Time.millisToPosix 0, zone = Time.utc, isDemoMode = False, demoTimeMinutes = 420 }
+    , Task.perform AdjustTimeZone Time.here
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -70,6 +72,18 @@ update msg model =
 
         ResetContexte ->
             ( { model | contexte = Nothing }, Cmd.none )
+
+        Tick newTime ->
+            ( { model | currentTime = newTime }, Cmd.none )
+
+        AdjustTimeZone newZone ->
+            ( { model | zone = newZone }, Cmd.none )
+
+        SetDemoMode enabled ->
+            ( { model | isDemoMode = enabled }, Cmd.none )
+
+        SetDemoTime minutes ->
+            ( { model | demoTimeMinutes = minutes }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -139,7 +153,8 @@ viewStandardLayout model ctx =
                 [ button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick ResetContexte ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
                 , div [ class "flex items-center gap-4" ]
-                    [ case ctx of
+                    [ viewDemoMode model
+                    , case ctx of
                         PourVestiaire n ->
                             if n > 0 then
                                 button [ class "btn-primary !py-1 text-xs", onClick Print ]
@@ -254,34 +269,93 @@ viewCheckbox name isChecked =
 
 viewPlanning : Model -> UserContext -> List (Html Msg)
 viewPlanning model ctx =
+    let
+        realMinutes =
+            posixToMinutes model.zone model.currentTime
+
+        nowMinutes =
+            getEffectiveMinutes model realMinutes
+
+        relevantPlanning =
+            model.planning
+                |> List.filter (\c -> estEncorePertinent c nowMinutes)
+    in
     case ctx of
         PourPatineur "" ->
             [ div [ class "text-center py-10 text-gray-500" ] [ text "Veuillez sélectionner une équipe." ] ]
 
         PourPatineur teamName ->
-            List.map viewCreneau (getHorairesPatineur teamName model.planning)
+            getHorairesPatineur teamName relevantPlanning
+                |> List.map (viewCreneauWithTime nowMinutes)
 
         PourCoach set ->
             if Set.isEmpty set then
                 [ div [ class "text-center py-10 text-gray-500" ] [ text "Veuillez sélectionner au moins une équipe." ] ]
 
             else
-                List.map viewCreneau (getHorairesCoach set model.planning)
+                getHorairesCoach set relevantPlanning
+                    |> List.map (viewCreneauWithTime nowMinutes)
 
         PourBuvette ->
-            List.map viewBuvetteCreneau (getHorairesBuvette model.planning)
+            getHorairesBuvette relevantPlanning
+                |> List.map (viewBuvetteCreneau nowMinutes)
 
         PourVestiaire vNum ->
             if vNum == 0 then
                 []
 
             else
-                getHorairesVestiaireGrouped vNum model.planning
+                getHorairesVestiaireGrouped vNum relevantPlanning
                     |> List.concatMap viewVestiaireCategorie
 
 
-viewCreneau : ViewCreneau -> Html Msg
-viewCreneau creneau =
+viewDemoMode : Model -> Html Msg
+viewDemoMode model =
+    div [ class "flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10" ]
+        [ div [ class "flex items-center gap-2" ]
+            [ span [ class "text-[10px] font-black text-white/50 uppercase tracking-widest" ] [ text "Mode Démo" ]
+            , input
+                [ type_ "checkbox"
+                , checked model.isDemoMode
+                , onCheck SetDemoMode
+                , class "relative w-10 h-5 bg-white/10 rounded-full appearance-none cursor-pointer transition-colors checked:bg-[#ea3a60] before:content-[''] before:absolute before:top-1 before:left-1 before:w-3 before:h-3 before:bg-white before:rounded-full before:transition-transform checked:before:translate-x-5"
+                ]
+                []
+            ]
+        , if model.isDemoMode then
+            div [ class "flex items-center gap-3" ]
+                [ input
+                    [ type_ "range"
+                    , Html.Attributes.min "420"
+                    , Html.Attributes.max "1200"
+                    , value (String.fromInt model.demoTimeMinutes)
+                    , onInput (String.toInt >> Maybe.withDefault 420 >> SetDemoTime)
+                    , class "w-32 accent-[#ea3a60]"
+                    ]
+                    []
+                , span [ class "font-mono font-bold text-[#ea3a60] text-sm tabular-nums w-12" ]
+                    [ text (formatTime { hour = model.demoTimeMinutes // 60, minute = remainderBy 60 model.demoTimeMinutes }) ]
+                ]
+
+          else
+            text ""
+        ]
+
+
+viewCreneauWithTime : Int -> ViewCreneau -> Html Msg
+viewCreneauWithTime nowMinutes creneau =
+    let
+        timeMinutes =
+            viewCreneauToMinutes creneau
+
+        isPast =
+            nowMinutes > timeMinutes
+    in
+    viewCreneau nowMinutes creneau isPast
+
+
+viewCreneau : Int -> ViewCreneau -> Bool -> Html Msg
+viewCreneau nowMinutes creneau isPast =
     let
         isSurfacage =
             String.contains "Surfaçage" creneau.name
@@ -295,8 +369,18 @@ viewCreneau creneau =
 
             else
                 "border-slate-100 print:border-slate-100"
+
+        opacityClass =
+            if isPast then
+                " event-past"
+
+            else if (viewCreneauToMinutes creneau - nowMinutes) <= 10 && (viewCreneauToMinutes creneau - nowMinutes) >= 0 then
+                " event-imminent"
+
+            else
+                ""
     in
-    div [ class (baseClass ++ borderClass) ]
+    div [ class (baseClass ++ borderClass ++ opacityClass) ]
         [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-12 print:pr-1" ]
             [ div [ class "text-xl font-black text-[#1d1d1d] font-mono tracking-tight print:text-sm" ] [ text creneau.time ]
             , div [ class "text-[10px] font-black text-slate-400 uppercase tracking-widest print:hidden" ] [ text "Heure" ]
@@ -342,9 +426,26 @@ viewVestiairePassage p =
         ]
 
 
-viewBuvetteCreneau : ViewCreneau -> Html Msg
-viewBuvetteCreneau creneau =
-    div [ class "relative group flex items-center gap-6 p-6 bg-white border-2 border-red-100 rounded-[2rem] shadow-sm overflow-hidden" ]
+viewBuvetteCreneau : Int -> ViewCreneau -> Html Msg
+viewBuvetteCreneau nowMinutes creneau =
+    let
+        timeMinutes =
+            viewCreneauToMinutes creneau
+
+        isPast =
+            nowMinutes > (timeMinutes + 15)
+
+        opacityClass =
+            if isPast then
+                " event-past"
+
+            else if (timeMinutes - nowMinutes) <= 10 && (timeMinutes - nowMinutes) >= 0 then
+                " event-imminent"
+
+            else
+                ""
+    in
+    div [ class ("relative group flex items-center gap-6 p-6 bg-white border-2 border-red-100 rounded-[2rem] shadow-sm overflow-hidden" ++ opacityClass) ]
         [ div [ class "absolute inset-0 bg-red-50/50 animate-pulse pointer-events-none" ] []
         , div [ class "z-10 flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-red-100 pr-6" ]
             [ div [ class "text-2xl font-black text-red-600 font-mono tracking-tight" ] [ text creneau.time ]
@@ -381,5 +482,5 @@ main =
         { init = init
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = \_ -> Time.every 60000 Tick
         }

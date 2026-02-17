@@ -2,6 +2,7 @@ module Model exposing (..)
 
 import Json.Decode as Decode exposing (Decoder)
 import Set
+import Time
 
 
 
@@ -64,7 +65,11 @@ type UserContext
 
 type alias Model =
     { planning : List Creneau
-    , contexte : UserContext
+    , contexte : Maybe UserContext
+    , currentTime : Time.Posix
+    , zone : Time.Zone
+    , isDemoMode : Bool
+    , demoTimeMinutes : Int
     }
 
 
@@ -308,11 +313,51 @@ estUnMomentChaud activite =
             False
 
 
-getHorairesBuvette : List Creneau -> List ViewCreneau
 getHorairesBuvette pl =
     pl
         |> List.filter (\c -> estUnMomentChaud c.activite)
         |> prepareViewData
+
+
+estEncorePertinent : Creneau -> Int -> Bool
+estEncorePertinent creneau nowMinutes =
+    let
+        finMinutes =
+            case creneau.activite of
+                Passage details ->
+                    timeToMinutes details.sortieVestiaireDefinitive
+
+                Surfacage duration ->
+                    timeToMinutes creneau.heureDebut + duration
+
+                Pause _ duration ->
+                    timeToMinutes creneau.heureDebut + duration
+
+                Podium _ ->
+                    timeToMinutes creneau.heureDebut + 15
+    in
+    nowMinutes < finMinutes + 20
+
+
+posixToMinutes : Time.Zone -> Time.Posix -> Int
+posixToMinutes zone posix =
+    let
+        h =
+            Time.toHour zone posix
+
+        m =
+            Time.toMinute zone posix
+    in
+    h * 60 + m
+
+
+getEffectiveMinutes : Model -> Int -> Int
+getEffectiveMinutes model realMinutes =
+    if model.isDemoMode then
+        model.demoTimeMinutes
+
+    else
+        realMinutes
 
 
 timeToMinutes : Time -> Int
