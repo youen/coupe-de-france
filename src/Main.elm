@@ -183,18 +183,7 @@ viewStandardLayout model ctx =
                         _ ->
                             text ""
                     , div [ class "flex flex-col items-end" ]
-                        [ div [ class "font-black text-xl text-[#ea3a60] tracking-wider" ] [ text "CDF 2026" ]
-                        , case ctx of
-                            PourVestiaire n ->
-                                if n > 0 then
-                                    div [ class "text-[10px] font-black text-white/40 uppercase tracking-widest" ] [ text ("Vestiaire " ++ String.fromInt n) ]
-
-                                else
-                                    text ""
-
-                            _ ->
-                                text ""
-                        ]
+                        [ div [ class "font-black text-xl text-[#ea3a60] tracking-wider" ] [ text "CDF 2026" ] ]
                     ]
                 ]
             ]
@@ -268,7 +257,7 @@ viewSelection model ctx =
             else
                 div [ class "mb-8 flex items-center justify-center p-6 bg-white rounded-3xl border border-slate-100 shadow-sm" ]
                     [ div [ class "text-center" ]
-                        [ div [ class "text-xs font-black text-slate-400 uppercase tracking-widest mb-1" ] [ text "Vestiaire actuel" ]
+                        [ div [ class "text-xs font-black text-slate-400 uppercase tracking-widest mb-1" ] [ text "Vestiaire" ]
                         , div [ class "text-4xl font-black text-[#ea3a60]" ] [ text (String.fromInt vNum) ]
                         ]
                     ]
