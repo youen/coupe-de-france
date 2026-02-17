@@ -150,7 +150,20 @@ viewStandardLayout model ctx =
         [ -- Sticky Header
           header [ class "sticky top-0 z-30 bg-[#171717] border-b border-black/10 px-4 py-3 shadow-xl print:hidden" ]
             [ div [ class "max-w-4xl mx-auto flex items-center justify-between" ]
-                [ button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick ResetContexte ]
+                [ let
+                    backMsg =
+                        case ctx of
+                            PourVestiaire n ->
+                                if n > 0 then
+                                    SetContexte (PourVestiaire 0)
+
+                                else
+                                    ResetContexte
+
+                            _ ->
+                                ResetContexte
+                  in
+                  button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick backMsg ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
                 , div [ class "flex items-center gap-4" ]
                     [ viewDemoMode model
@@ -165,7 +178,19 @@ viewStandardLayout model ctx =
 
                         _ ->
                             text ""
-                    , div [ class "font-black text-xl text-[#ea3a60] tracking-tighter" ] [ text "CDF 2026" ]
+                    , div [ class "flex flex-col items-end" ]
+                        [ div [ class "font-black text-xl text-[#ea3a60] tracking-wider" ] [ text "CDF 2026" ]
+                        , case ctx of
+                            PourVestiaire n ->
+                                if n > 0 then
+                                    div [ class "text-[10px] font-black text-white/40 uppercase tracking-widest" ] [ text ("Vestiaire " ++ String.fromInt n) ]
+
+                                else
+                                    text ""
+
+                            _ ->
+                                text ""
+                        ]
                     ]
                 ]
             ]
@@ -174,7 +199,7 @@ viewStandardLayout model ctx =
                 [ case ctx of
                     PourVestiaire n ->
                         div [ class "text-center border-2 border-black p-2 mb-2" ]
-                            [ h1 [ class "text-lg font-black uppercase tracking-tighter inline-block mr-2" ] [ text "VESTIAIRE" ]
+                            [ h1 [ class "text-lg font-black uppercase tracking-wider inline-block mr-2" ] [ text "VESTIAIRE" ]
                             , div [ class "text-2xl font-black inline-block" ] [ text (String.fromInt n) ]
                             ]
 
@@ -237,7 +262,12 @@ viewSelection model ctx =
                     )
 
             else
-                text ""
+                div [ class "mb-8 flex items-center justify-center p-6 bg-white rounded-3xl border border-slate-100 shadow-sm" ]
+                    [ div [ class "text-center" ]
+                        [ div [ class "text-xs font-black text-slate-400 uppercase tracking-widest mb-1" ] [ text "Vestiaire actuel" ]
+                        , div [ class "text-4xl font-black text-[#ea3a60]" ] [ text (String.fromInt vNum) ]
+                        ]
+                    ]
 
         PourBuvette ->
             text ""
@@ -460,8 +490,8 @@ viewMilestoneHeader label =
 
 viewVestiairePassage : VestiairePassage -> Html Msg
 viewVestiairePassage p =
-    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-2 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-300 print:rounded-none print:p-0 print:px-4 print:mb-0 print:py-3" ]
-        [ div [ class "flex-1 font-bold text-slate-800 print:text-[14px] print:font-black uppercase pr-4 print:text-black print:tracking-wider" ] [ text p.nom ]
+    div [ class "group flex items-center justify-between p-6 bg-white border border-slate-100 rounded-3xl shadow-sm mb-3 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-300 print:rounded-none print:p-0 print:px-4 print:mb-0 print:py-3" ]
+        [ div [ class "flex-1 font-bold text-slate-800 tracking-wide print:text-[14px] print:font-black uppercase pr-4 print:text-black print:tracking-wider" ] [ text p.nom ]
         , div [ class "flex items-center gap-4 font-mono text-slate-600 print:text-black print:gap-2" ]
             [ viewMilestoneTime p.entreeV
             , viewMilestoneTime p.sortieV
