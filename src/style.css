@@ -45,6 +45,15 @@
     background: white;
     font-family: 'Inter', sans-serif !important;
     color: black !important;
+    letter-spacing: 0.01em;
+    /* Slight spacing for better net appearance */
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: 0.05em !important;
+    /* Breath for titles */
   }
 
   .print\:hidden {
@@ -55,14 +64,16 @@
   .text-slate-500,
   .text-slate-400,
   .text-slate-600,
-  .text-gray-500 {
+  .text-gray-500,
+  .text-slate-800 {
     color: black !important;
   }
 
   /* High legibility for times */
   .font-mono {
     font-family: 'Inter', sans-serif !important;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.05em !important;
+    /* Spread numbers for clarity */
     font-weight: 700 !important;
   }
 }

@@ -440,7 +440,7 @@ viewVestiaireCategorie cat =
         [ div [ class "flex items-end justify-between" ]
             [ div [ class "px-4 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg print:bg-black print:rounded-none print:px-2" ]
                 [ text cat.nom ]
-            , div [ class "flex gap-4 px-4 print:gap-2 print:px-0" ]
+            , div [ class "flex gap-4 px-4 print:gap-2 print:px-3" ]
                 [ viewMilestoneHeader "Entrée V."
                 , viewMilestoneHeader "Sortie V."
                 , viewMilestoneHeader "Entrée P."
@@ -460,8 +460,8 @@ viewMilestoneHeader label =
 
 viewVestiairePassage : VestiairePassage -> Html Msg
 viewVestiairePassage p =
-    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-2 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-300 print:rounded-none print:p-0 print:mb-0 print:py-2" ]
-        [ div [ class "flex-1 font-bold text-slate-800 print:text-[14px] print:font-black uppercase pr-4 print:text-black" ] [ text p.nom ]
+    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-2 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-300 print:rounded-none print:p-0 print:px-4 print:mb-0 print:py-3" ]
+        [ div [ class "flex-1 font-bold text-slate-800 print:text-[14px] print:font-black uppercase pr-4 print:text-black print:tracking-wider" ] [ text p.nom ]
         , div [ class "flex items-center gap-4 font-mono text-slate-600 print:text-black print:gap-2" ]
             [ viewMilestoneTime p.entreeV
             , viewMilestoneTime p.sortieV
