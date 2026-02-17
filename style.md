@@ -75,3 +75,12 @@ Pour respecter ton site, on peut jouer sur les transitions :
 
 ```
 
+### 🎨 Échelle de Couleurs (Style LL-Nantes)
+
+| Type d'événement | Icône | Style Entraînement | Style Compétition |
+| --- | --- | --- | --- |
+| **Vestiaire** | 🚪 | Gris clair | Rose très pâle |
+| **Piste (Glace)** | ⛸️ | **Gris Foncé / Gras** | **Rose Intense (#ea3a60)** |
+| **Surfaçage** | 🧊 | Bleu givré très clair | Bleu givré |
+| **Podium** | 🏆 | - | **Or / Jaune vif** |
+

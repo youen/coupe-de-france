@@ -111,6 +111,7 @@ suite =
                     details =
                         { nom = "ZEPHYR"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 7, minute = 38 }
                         , sortieVestiaire = { hour = 7, minute = 58 }
@@ -128,15 +129,15 @@ suite =
                 let
                     planning =
                         [ { heureDebut = { hour = 7, minute = 30 }, activite = Surfacage 8 }
-                        , { heureDebut = { hour = 7, minute = 38 }, activite = Passage { nom = "ZEPHYR", categorie = "ADULTE", numVestiaire = 1, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
+                        , { heureDebut = { hour = 7, minute = 38 }, activite = Passage { nom = "ZEPHYR", categorie = "ADULTE", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
                         ]
 
                     viewData =
                         prepareViewData planning
                 in
                 Expect.equal viewData
-                    [ { time = "07:30", name = "Surfaçage", category = "" }
-                    , { time = "07:38", name = "ZEPHYR", category = "ADULTE" }
+                    [ { time = "07:30", name = "Surfaçage", category = "", icon = "🧊", session = Nothing, isGlissage = False }
+                    , { time = "07:38", name = "ZEPHYR", category = "ADULTE", icon = "⛸️", session = Just Entrainement, isGlissage = True }
                     ]
         , test "can decode the first few items of the real planning.json" <|
             \_ ->
@@ -175,9 +176,9 @@ suite =
                 let
                     planning =
                         [ { heureDebut = { hour = 7, minute = 30 }, activite = Surfacage 8 }
-                        , { heureDebut = { hour = 7, minute = 38 }, activite = Passage { nom = "ZEPHYR", categorie = "ADULTE", numVestiaire = 1, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
-                        , { heureDebut = { hour = 7, minute = 46 }, activite = Passage { nom = "TONNERRES", categorie = "ADULTE", numVestiaire = 2, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
-                        , { heureDebut = { hour = 7, minute = 54 }, activite = Passage { nom = "ZEPHYR", categorie = "ADULTE", numVestiaire = 1, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
+                        , { heureDebut = { hour = 7, minute = 38 }, activite = Passage { nom = "ZEPHYR", categorie = "ADULTE", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
+                        , { heureDebut = { hour = 7, minute = 46 }, activite = Passage { nom = "TONNERRES", categorie = "ADULTE", session = Entrainement, numVestiaire = 2, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
+                        , { heureDebut = { hour = 7, minute = 54 }, activite = Passage { nom = "ZEPHYR", categorie = "ADULTE", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 0, minute = 0 }, sortieVestiaire = { hour = 0, minute = 0 }, entreePiste = { hour = 0, minute = 0 }, sortiePiste = { hour = 0, minute = 0 }, sortieVestiaireDefinitive = { hour = 0, minute = 0 } } }
                         ]
 
                     equipes =
@@ -190,6 +191,7 @@ suite =
                     details =
                         { nom = "ZEPHYR"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 7, minute = 38 }
                         , sortieVestiaire = { hour = 7, minute = 58 }
@@ -211,6 +213,7 @@ suite =
                     details1 =
                         { nom = "ZEPHYR"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 8, minute = 0 }
                         , sortieVestiaire = { hour = 8, minute = 20 }
@@ -222,6 +225,7 @@ suite =
                     details2 =
                         { nom = "TONNERRES"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 2
                         , entreeVestiaire = { hour = 7, minute = 30 }
                         , sortieVestiaire = { hour = 7, minute = 50 }
@@ -251,6 +255,7 @@ suite =
                     details1 =
                         { nom = "ZEPHYR"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 8, minute = 0 }
                         , sortieVestiaire = { hour = 8, minute = 20 }
@@ -262,6 +267,7 @@ suite =
                     details2 =
                         { nom = "TONNERRES"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 2
                         , entreeVestiaire = { hour = 7, minute = 30 }
                         , sortieVestiaire = { hour = 7, minute = 50 }
@@ -293,6 +299,7 @@ suite =
                     details1 =
                         { nom = "ZEPHYR"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 8, minute = 0 }
                         , sortieVestiaire = { hour = 8, minute = 20 }
@@ -304,6 +311,7 @@ suite =
                     details2 =
                         { nom = "BRISE"
                         , categorie = "ADULTE"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 9, minute = 0 }
                         , sortieVestiaire = { hour = 9, minute = 20 }
@@ -315,6 +323,7 @@ suite =
                     details3 =
                         { nom = "PETIT"
                         , categorie = "PREPA"
+                        , session = Entrainement
                         , numVestiaire = 1
                         , entreeVestiaire = { hour = 10, minute = 0 }
                         , sortieVestiaire = { hour = 10, minute = 20 }
@@ -338,7 +347,7 @@ suite =
                 \_ ->
                     let
                         creneau =
-                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
 
                         currentTimeMinutes =
                             8 * 60
@@ -350,7 +359,7 @@ suite =
                 \_ ->
                     let
                         creneau =
-                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
 
                         currentTimeMinutes =
                             10 * 60 + 5
@@ -362,7 +371,7 @@ suite =
                 \_ ->
                     let
                         creneau =
-                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
 
                         currentTimeMinutes =
                             10 * 60 + 30 + 19
@@ -374,7 +383,7 @@ suite =
                 \_ ->
                     let
                         creneau =
-                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
+                            { heureDebut = { hour = 10, minute = 0 }, activite = Passage { nom = "T1", categorie = "C1", session = Entrainement, numVestiaire = 1, entreeVestiaire = { hour = 9, minute = 0 }, sortieVestiaire = { hour = 10, minute = 0 }, entreePiste = { hour = 10, minute = 0 }, sortiePiste = { hour = 10, minute = 10 }, sortieVestiaireDefinitive = { hour = 10, minute = 30 } } }
 
                         currentTimeMinutes =
                             10 * 60 + 30 + 21

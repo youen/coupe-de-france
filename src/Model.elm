@@ -15,13 +15,22 @@ type alias Time =
     }
 
 
+type SessionType
+    = Entrainement
+    | Competition
 
--- 2. Détails spécifiques à une équipe
+
+type JalonType
+    = HJalonEntreeVestiaire
+    | HJalonEntreePiste
+    | HJalonSortiePiste
+    | HJalonSortieVestiaire
 
 
 type alias EquipeDetails =
     { nom : String
     , categorie : String
+    , session : SessionType
     , numVestiaire : Int
     , entreeVestiaire : Time
     , sortieVestiaire : Time
@@ -111,6 +120,9 @@ type alias ViewCreneau =
     { time : String
     , name : String
     , category : String
+    , icon : String
+    , session : Maybe SessionType
+    , isGlissage : Bool -- True if it's EntreePiste or similar focal point
     }
 
 
@@ -135,10 +147,41 @@ prepareViewData pl =
                 let
                     info =
                         getActiviteInfo c.activite
+
+                    icon =
+                        case c.activite of
+                            Surfacage _ ->
+                                "🧊"
+
+                            Pause _ _ ->
+                                "☕"
+
+                            Podium _ ->
+                                "🏆"
+
+                            Passage _ ->
+                                "⛸️"
+
+                    session =
+                        case c.activite of
+                            Passage details ->
+                                Just details.session
+
+                            _ ->
+                                Nothing
                 in
                 { time = formatTime c.heureDebut
                 , name = info.nom
                 , category = info.categorie
+                , icon = icon
+                , session = session
+                , isGlissage =
+                    case c.activite of
+                        Passage _ ->
+                            True
+
+                        _ ->
+                            False
                 }
             )
 
@@ -160,7 +203,6 @@ getEquipes pl =
         |> List.sort
 
 
-getHorairesPatineur : String -> List Creneau -> List ViewCreneau
 getHorairesPatineur teamName pl =
     pl
         |> List.filterMap
@@ -178,16 +220,15 @@ getHorairesPatineur teamName pl =
             )
         |> List.concatMap
             (\details ->
-                [ { time = formatTime details.entreeVestiaire, name = "Entrée Vestiaire", category = "Vestiaire " ++ String.fromInt details.numVestiaire }
-                , { time = formatTime details.sortieVestiaire, name = "Sortie Vestiaire", category = "" }
-                , { time = formatTime details.entreePiste, name = "Entrée Piste", category = details.categorie }
-                , { time = formatTime details.sortiePiste, name = "Sortie Piste", category = "" }
-                , { time = formatTime details.sortieVestiaireDefinitive, name = "Sortie Vestiaire Définitive", category = "" }
+                [ { time = formatTime details.entreeVestiaire, name = "Entrée Vestiaire", category = "Vestiaire " ++ String.fromInt details.numVestiaire, icon = "🚪", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaire, name = "Sortie Vestiaire", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.entreePiste, name = "Entrée Piste", category = details.categorie, icon = "⛸️", session = Just details.session, isGlissage = True }
+                , { time = formatTime details.sortiePiste, name = "Sortie Piste", category = "", icon = "⛸️", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaireDefinitive, name = "Sortie Vestiaire Définitive", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
                 ]
             )
 
 
-getHorairesCoach : Set.Set String -> List Creneau -> List ViewCreneau
 getHorairesCoach teamNames pl =
     pl
         |> List.filterMap
@@ -205,17 +246,16 @@ getHorairesCoach teamNames pl =
             )
         |> List.concatMap
             (\details ->
-                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée V", category = "Vestiaire " ++ String.fromInt details.numVestiaire }
-                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie V", category = "" }
-                , { time = formatTime details.entreePiste, name = details.nom ++ " - Entrée Piste", category = details.categorie }
-                , { time = formatTime details.sortiePiste, name = details.nom ++ " - Sortie Piste", category = "" }
-                , { time = formatTime details.sortieVestiaireDefinitive, name = details.nom ++ " - Sortie V Déf", category = "" }
+                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée V", category = "Vestiaire " ++ String.fromInt details.numVestiaire, icon = "🚪", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie V", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.entreePiste, name = details.nom ++ " - Entrée Piste", category = details.categorie, icon = "⛸️", session = Just details.session, isGlissage = True }
+                , { time = formatTime details.sortiePiste, name = details.nom ++ " - Sortie Piste", category = "", icon = "⛸️", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaireDefinitive, name = details.nom ++ " - Sortie V Déf", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
                 ]
             )
         |> List.sortWith (\a b -> compareViewCreneau a b)
 
 
-getHorairesVestiaire : Int -> List Creneau -> List ViewCreneau
 getHorairesVestiaire vNumber pl =
     pl
         |> List.filterMap
@@ -233,8 +273,8 @@ getHorairesVestiaire vNumber pl =
             )
         |> List.concatMap
             (\details ->
-                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée", category = details.categorie }
-                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie", category = "" }
+                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée", category = details.categorie, icon = "🚪", session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
                 ]
             )
         |> List.sortWith (\a b -> compareViewCreneau a b)
@@ -440,12 +480,35 @@ activiteDecoder =
 
 equipeDetailsDecoder : Decoder EquipeDetails
 equipeDetailsDecoder =
-    Decode.map8 EquipeDetails
-        (Decode.field "equipe" Decode.string)
-        (Decode.field "categorie" Decode.string)
-        (Decode.field "vestiaire" Decode.int)
-        (Decode.field "entree_v" timeDecoder)
-        (Decode.field "sortie_v" timeDecoder)
-        (Decode.field "entree_p" timeDecoder)
-        (Decode.field "sortie_p" timeDecoder)
-        (Decode.field "fin_v" timeDecoder)
+    Decode.succeed EquipeDetails
+        |> andMap (Decode.field "equipe" Decode.string)
+        |> andMap (Decode.field "categorie" Decode.string)
+        |> andMap (Decode.field "session" sessionTypeDecoder)
+        |> andMap (Decode.field "vestiaire" Decode.int)
+        |> andMap (Decode.field "entree_v" timeDecoder)
+        |> andMap (Decode.field "sortie_v" timeDecoder)
+        |> andMap (Decode.field "entree_p" timeDecoder)
+        |> andMap (Decode.field "sortie_p" timeDecoder)
+        |> andMap (Decode.field "fin_v" timeDecoder)
+
+
+andMap : Decoder a -> Decoder (a -> b) -> Decoder b
+andMap =
+    Decode.map2 (|>)
+
+
+sessionTypeDecoder : Decoder SessionType
+sessionTypeDecoder =
+    Decode.string
+        |> Decode.andThen
+            (\s ->
+                case s of
+                    "ENTRAINEMENT" ->
+                        Decode.succeed Entrainement
+
+                    "COMPETITION" ->
+                        Decode.succeed Competition
+
+                    _ ->
+                        Decode.fail ("Unknown session type: " ++ s)
+            )

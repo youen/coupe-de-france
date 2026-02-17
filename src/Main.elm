@@ -360,15 +360,29 @@ viewCreneau nowMinutes creneau isPast =
         isSurfacage =
             String.contains "Surfaçage" creneau.name
 
+        sessionClass =
+            case creneau.session of
+                Just Competition ->
+                    " border-l-[12px] border-l-[#ea3a60] bg-white"
+
+                Just Entrainement ->
+                    " border-l-[12px] border-l-slate-300 bg-slate-50/50"
+
+                Nothing ->
+                    if isSurfacage then
+                        " bg-[#e0f2fe]/30 border-l-[12px] border-l-[#bae6fd]"
+
+                    else if creneau.icon == "🏆" then
+                        " bg-[#fef9c3]/30 border-l-[12px] border-l-[#fde047]"
+
+                    else
+                        " bg-white"
+
         baseClass =
-            "group flex items-center gap-6 p-5 bg-white border rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b print:rounded-none print:p-0.5 print:gap-2 "
+            "group flex items-center gap-6 p-5 border rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 print:shadow-none print:border-b print:rounded-none print:p-0.5 print:gap-2 "
 
         borderClass =
-            if isSurfacage then
-                "border-[#ea3a60] border-4 print:border-black"
-
-            else
-                "border-slate-100 print:border-slate-100"
+            "border-slate-100"
 
         opacityClass =
             if isPast then
@@ -379,20 +393,31 @@ viewCreneau nowMinutes creneau isPast =
 
             else
                 ""
+
+        accentClass =
+            if creneau.isGlissage && not isPast then
+                if creneau.session == Just Competition then
+                    " text-[#ea3a60] font-black"
+
+                else
+                    " text-slate-900 font-extrabold"
+
+            else
+                " text-slate-700"
     in
-    div [ class (baseClass ++ borderClass ++ opacityClass) ]
+    div [ class (baseClass ++ borderClass ++ opacityClass ++ sessionClass) ]
         [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-12 print:pr-1" ]
             [ div [ class "text-xl font-black text-[#1d1d1d] font-mono tracking-tight print:text-sm" ] [ text creneau.time ]
-            , div [ class "text-[10px] font-black text-slate-400 uppercase tracking-widest print:hidden" ] [ text "Heure" ]
+            , div [ class "text-2xl mt-1 print:hidden" ] [ text creneau.icon ]
             ]
         , div [ class "flex-1 flex items-baseline gap-2 overflow-hidden" ]
-            [ div [ class "font-black text-[#1d1d1d] text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-sm print:truncate" ]
+            [ div [ class ("text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-sm print:truncate " ++ accentClass) ]
                 [ text (String.toUpper creneau.name) ]
             , if String.isEmpty creneau.category then
                 text ""
 
               else
-                span [ class "inline-block px-2 py-0.5 bg-slate-50 text-slate-400 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-[10px] print:bg-transparent print:p-0 print:italic print:font-medium" ] [ text ("(" ++ creneau.category ++ ")") ]
+                span [ class "inline-block px-2 py-0.5 bg-black/5 text-slate-500 text-[10px] font-bold rounded-md uppercase tracking-wider print:text-[10px] print:bg-transparent print:p-0 print:italic print:font-medium" ] [ text ("(" ++ creneau.category ++ ")") ]
             ]
         , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors print:hidden" ] []
         ]
@@ -449,7 +474,7 @@ viewBuvetteCreneau nowMinutes creneau =
         [ div [ class "absolute inset-0 bg-red-50/50 animate-pulse pointer-events-none" ] []
         , div [ class "z-10 flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-red-100 pr-6" ]
             [ div [ class "text-2xl font-black text-red-600 font-mono tracking-tight" ] [ text creneau.time ]
-            , div [ class "text-[10px] font-black text-red-400 uppercase tracking-widest" ] [ text "Rush" ]
+            , div [ class "text-2xl mt-1 print:hidden" ] [ text creneau.icon ]
             ]
         , div [ class "z-10 flex-1" ]
             [ div [ class "font-black text-slate-800 text-xl uppercase leading-tight mb-1" ] [ text creneau.name ]
