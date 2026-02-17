@@ -305,7 +305,7 @@ viewPlanning model ctx =
                 []
 
             else
-                getHorairesVestiaireGrouped vNum relevantPlanning
+                getHorairesVestiaireGrouped vNum model.planning
                     |> List.concatMap viewVestiaireCategorie
 
 
@@ -436,30 +436,45 @@ viewCreneau nowMinutes creneau isPast =
 
 viewVestiaireCategorie : VestiaireCategorie -> List (Html Msg)
 viewVestiaireCategorie cat =
-    div [ class "mt-10 mb-6 first:mt-0 print:mt-4 print:mb-2" ]
-        [ div [ class "inline-block px-4 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg print:bg-black print:rounded-none print:px-2" ]
-            [ text cat.nom ]
+    div [ class "mt-10 mb-4 first:mt-0 print:mt-6 print:mb-2" ]
+        [ div [ class "flex items-end justify-between" ]
+            [ div [ class "px-4 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg print:bg-black print:rounded-none print:px-2" ]
+                [ text cat.nom ]
+            , div [ class "flex gap-4 px-4 print:gap-2 print:px-0" ]
+                [ viewMilestoneHeader "Vest. In"
+                , viewMilestoneHeader "Vest. Out"
+                , viewMilestoneHeader "Piste In"
+                , viewMilestoneHeader "Piste Out"
+                , viewMilestoneHeader "V. Déf"
+                ]
+            ]
         , div [ class "h-0.5 bg-slate-800 w-full mt-1 print:bg-black" ] []
         ]
         :: List.map viewVestiairePassage cat.passages
 
 
+viewMilestoneHeader : String -> Html Msg
+viewMilestoneHeader label =
+    div [ class "w-14 print:w-12 text-center text-[7px] font-black text-slate-400 uppercase tracking-tighter print:text-black" ] [ text label ]
+
+
 viewVestiairePassage : VestiairePassage -> Html Msg
 viewVestiairePassage p =
-    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-3 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-none print:p-0 print:mb-0 print:pt-1" ]
-        [ div [ class "flex-1 font-bold text-slate-800 print:text-[13px] print:font-black uppercase" ] [ text p.nom ]
-        , div [ class "flex items-center gap-3 font-mono text-slate-500 print:text-xs print:text-black font-bold" ]
-            [ div [ class "flex flex-col items-center" ]
-                [ span [ class "text-[8px] text-slate-400 uppercase font-sans print:hidden" ] [ text "In" ]
-                , text p.entree
-                ]
-            , span [ class "px-2 text-slate-300 print:text-black font-sans" ] [ text "–" ]
-            , div [ class "flex flex-col items-center" ]
-                [ span [ class "text-[8px] text-slate-400 uppercase font-sans print:hidden" ] [ text "Out" ]
-                , text p.sortie
-                ]
+    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-2 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:mb-0 print:py-1" ]
+        [ div [ class "flex-1 font-bold text-slate-800 print:text-[12px] print:font-bold uppercase pr-4" ] [ text p.nom ]
+        , div [ class "flex items-center gap-4 font-mono text-slate-600 print:text-black print:gap-2" ]
+            [ viewMilestoneTime p.entreeV
+            , viewMilestoneTime p.sortieV
+            , viewMilestoneTime p.entreeP
+            , viewMilestoneTime p.sortieP
+            , viewMilestoneTime p.sortieVDef
             ]
         ]
+
+
+viewMilestoneTime : String -> Html Msg
+viewMilestoneTime time =
+    div [ class "w-14 print:w-12 text-center text-sm font-bold print:text-[11px]" ] [ text time ]
 
 
 viewBuvetteCreneau : Int -> ViewCreneau -> Html Msg

@@ -129,8 +129,11 @@ type alias ViewCreneau =
 
 type alias VestiairePassage =
     { nom : String
-    , entree : String
-    , sortie : String
+    , entreeV : String
+    , sortieV : String
+    , entreeP : String
+    , sortieP : String
+    , sortieVDef : String
     }
 
 
@@ -306,8 +309,11 @@ getHorairesVestiaireGrouped vNumber pl =
             let
                 vp =
                     { nom = p.nom
-                    , entree = formatTime p.entreeVestiaire
-                    , sortie = formatTime p.sortieVestiaire
+                    , entreeV = formatTime p.entreeVestiaire
+                    , sortieV = formatTime p.sortieVestiaire
+                    , entreeP = formatTime p.entreePiste
+                    , sortieP = formatTime p.sortiePiste
+                    , sortieVDef = formatTime p.sortieVestiaireDefinitive
                     }
             in
             case acc of
