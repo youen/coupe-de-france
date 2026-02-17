@@ -441,11 +441,11 @@ viewVestiaireCategorie cat =
             [ div [ class "px-4 py-1 bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg print:bg-black print:rounded-none print:px-2" ]
                 [ text cat.nom ]
             , div [ class "flex gap-4 px-4 print:gap-2 print:px-0" ]
-                [ viewMilestoneHeader "Vest. In"
-                , viewMilestoneHeader "Vest. Out"
-                , viewMilestoneHeader "Piste In"
-                , viewMilestoneHeader "Piste Out"
-                , viewMilestoneHeader "V. Déf"
+                [ viewMilestoneHeader "Entrée V."
+                , viewMilestoneHeader "Sortie V."
+                , viewMilestoneHeader "Entrée P."
+                , viewMilestoneHeader "Sortie P."
+                , viewMilestoneHeader "Fin V."
                 ]
             ]
         , div [ class "h-0.5 bg-slate-800 w-full mt-1 print:bg-black" ] []
