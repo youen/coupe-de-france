@@ -22,6 +22,7 @@ type Msg
     | AdjustTimeZone Time.Zone
     | SetDemoMode Bool
     | SetDemoTime Int
+    | GoBack
 
 
 port print : () -> Cmd msg
@@ -84,6 +85,22 @@ update msg model =
 
         SetDemoTime minutes ->
             ( { model | demoTimeMinutes = minutes }, Cmd.none )
+
+        GoBack ->
+            let
+                newCtx =
+                    case model.contexte of
+                        Just (PourVestiaire n) ->
+                            if n > 0 then
+                                Just (PourVestiaire 0)
+
+                            else
+                                Nothing
+
+                        _ ->
+                            Nothing
+            in
+            ( { model | contexte = newCtx }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -150,20 +167,7 @@ viewStandardLayout model ctx =
         [ -- Sticky Header
           header [ class "sticky top-0 z-30 bg-[#171717] border-b border-black/10 px-4 py-3 shadow-xl print:hidden" ]
             [ div [ class "max-w-4xl mx-auto flex items-center justify-between" ]
-                [ let
-                    backMsg =
-                        case ctx of
-                            PourVestiaire n ->
-                                if n > 0 then
-                                    SetContexte (PourVestiaire 0)
-
-                                else
-                                    ResetContexte
-
-                            _ ->
-                                ResetContexte
-                  in
-                  button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick backMsg ]
+                [ button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick GoBack ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
                 , div [ class "flex items-center gap-4" ]
                     [ viewDemoMode model
