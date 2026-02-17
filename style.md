@@ -47,3 +47,31 @@ h1, h2, h3 {
 
     Boutons de sélection : Gros boutons roses arrondis avec une ombre légère.
 
+
+### 🎨 Proposition d'évolution visuelle (CSS)
+
+Pour respecter ton site, on peut jouer sur les transitions :
+
+```css
+/* L'événement est passé mais pas encore masqué */
+.event-past {
+    opacity: 0.5;
+    filter: grayscale(80%);
+    border-left: 4px solid #cccccc; /* Gris au lieu du Rose */
+    transition: all 1s ease-in-out;
+}
+
+/* L'événement imminent (moins de 10 min) */
+.event-imminent {
+    border-left: 8px solid var(--ll-pink);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(234, 58, 96, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(234, 58, 96, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(234, 58, 96, 0); }
+}
+
+```
+
