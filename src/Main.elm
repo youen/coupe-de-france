@@ -408,7 +408,18 @@ viewCreneau nowMinutes creneau isPast =
     div [ class (baseClass ++ borderClass ++ opacityClass ++ sessionClass) ]
         [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6 print:w-12 print:pr-1" ]
             [ div [ class "text-xl font-black text-[#1d1d1d] font-mono tracking-tight print:text-sm" ] [ text creneau.time ]
-            , div [ class "text-2xl mt-1 print:hidden" ] [ text creneau.icon ]
+            , div
+                [ class "text-2xl mt-1 print:hidden"
+                , style "transform"
+                    (if creneau.flipIcon then
+                        "scaleX(-1)"
+
+                     else
+                        "none"
+                    )
+                , style "display" "inline-block"
+                ]
+                [ text creneau.icon ]
             ]
         , div [ class "flex-1 flex items-baseline gap-2 overflow-hidden" ]
             [ div [ class ("text-lg leading-tight mb-1 group-hover:text-[#ea3a60] transition-colors print:text-sm print:truncate " ++ accentClass) ]

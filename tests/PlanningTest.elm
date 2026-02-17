@@ -136,8 +136,8 @@ suite =
                         prepareViewData planning
                 in
                 Expect.equal viewData
-                    [ { time = "07:30", name = "Surfaçage", category = "", icon = "🧊", session = Nothing, isGlissage = False }
-                    , { time = "07:38", name = "ZEPHYR", category = "ADULTE", icon = "⛸️", session = Just Entrainement, isGlissage = True }
+                    [ { time = "07:30", name = "Surfaçage", category = "", icon = "🧊", session = Nothing, isGlissage = False, flipIcon = False }
+                    , { time = "07:38", name = "ZEPHYR", category = "ADULTE", icon = "⛸️", session = Just Entrainement, isGlissage = True, flipIcon = False }
                     ]
         , test "can decode the first few items of the real planning.json" <|
             \_ ->

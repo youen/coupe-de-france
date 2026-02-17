@@ -121,6 +121,7 @@ type alias ViewCreneau =
     , name : String
     , category : String
     , icon : String
+    , flipIcon : Bool
     , session : Maybe SessionType
     , isGlissage : Bool -- True if it's EntreePiste or similar focal point
     }
@@ -174,6 +175,7 @@ prepareViewData pl =
                 , name = info.nom
                 , category = info.categorie
                 , icon = icon
+                , flipIcon = False
                 , session = session
                 , isGlissage =
                     case c.activite of
@@ -220,11 +222,11 @@ getHorairesPatineur teamName pl =
             )
         |> List.concatMap
             (\details ->
-                [ { time = formatTime details.entreeVestiaire, name = "Entrée Vestiaire", category = "Vestiaire " ++ String.fromInt details.numVestiaire, icon = "🚪", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.sortieVestiaire, name = "Sortie Vestiaire", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.entreePiste, name = "Entrée Piste", category = details.categorie, icon = "⛸️", session = Just details.session, isGlissage = True }
-                , { time = formatTime details.sortiePiste, name = "Sortie Piste", category = "", icon = "⛸️", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.sortieVestiaireDefinitive, name = "Sortie Vestiaire Définitive", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
+                [ { time = formatTime details.entreeVestiaire, name = "Entrée Vestiaire", category = "Vestiaire " ++ String.fromInt details.numVestiaire, icon = "🚪", flipIcon = False, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaire, name = "Sortie Vestiaire", category = "", icon = "🏃", flipIcon = False, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.entreePiste, name = "Entrée Piste", category = details.categorie, icon = "⛸️", flipIcon = False, session = Just details.session, isGlissage = True }
+                , { time = formatTime details.sortiePiste, name = "Sortie Piste", category = "", icon = "⛸️", flipIcon = True, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaireDefinitive, name = "Sortie Vestiaire Définitive", category = "", icon = "🎒", flipIcon = False, session = Just details.session, isGlissage = False }
                 ]
             )
 
@@ -246,11 +248,11 @@ getHorairesCoach teamNames pl =
             )
         |> List.concatMap
             (\details ->
-                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée V", category = "Vestiaire " ++ String.fromInt details.numVestiaire, icon = "🚪", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie V", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.entreePiste, name = details.nom ++ " - Entrée Piste", category = details.categorie, icon = "⛸️", session = Just details.session, isGlissage = True }
-                , { time = formatTime details.sortiePiste, name = details.nom ++ " - Sortie Piste", category = "", icon = "⛸️", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.sortieVestiaireDefinitive, name = details.nom ++ " - Sortie V Déf", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
+                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée V", category = "Vestiaire " ++ String.fromInt details.numVestiaire, icon = "🚪", flipIcon = False, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie V", category = "", icon = "🏃", flipIcon = False, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.entreePiste, name = details.nom ++ " - Entrée Piste", category = details.categorie, icon = "⛸️", flipIcon = False, session = Just details.session, isGlissage = True }
+                , { time = formatTime details.sortiePiste, name = details.nom ++ " - Sortie Piste", category = "", icon = "⛸️", flipIcon = True, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaireDefinitive, name = details.nom ++ " - Sortie V Déf", category = "", icon = "🎒", flipIcon = False, session = Just details.session, isGlissage = False }
                 ]
             )
         |> List.sortWith (\a b -> compareViewCreneau a b)
@@ -273,8 +275,8 @@ getHorairesVestiaire vNumber pl =
             )
         |> List.concatMap
             (\details ->
-                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée", category = details.categorie, icon = "🚪", session = Just details.session, isGlissage = False }
-                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie", category = "", icon = "🎒", session = Just details.session, isGlissage = False }
+                [ { time = formatTime details.entreeVestiaire, name = details.nom ++ " - Entrée", category = details.categorie, icon = "🚪", flipIcon = False, session = Just details.session, isGlissage = False }
+                , { time = formatTime details.sortieVestiaire, name = details.nom ++ " - Sortie", category = "", icon = "🏃", flipIcon = False, session = Just details.session, isGlissage = False }
                 ]
             )
         |> List.sortWith (\a b -> compareViewCreneau a b)
