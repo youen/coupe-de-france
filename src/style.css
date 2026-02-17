@@ -43,12 +43,30 @@
 
   body {
     background: white;
+    font-family: 'Inter', sans-serif !important;
+    color: black !important;
   }
 
   .print\:hidden {
     display: none !important;
   }
+
+  /* Force absolute black for text during print */
+  .text-slate-500,
+  .text-slate-400,
+  .text-slate-600,
+  .text-gray-500 {
+    color: black !important;
+  }
+
+  /* High legibility for times */
+  .font-mono {
+    font-family: 'Inter', sans-serif !important;
+    letter-spacing: -0.02em;
+    font-weight: 700 !important;
+  }
 }
+
 /* US9: Visual lifecycle */
 .event-past {
   opacity: 0.5;
@@ -65,7 +83,15 @@
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(234, 58, 96, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(234, 58, 96, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(234, 58, 96, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(234, 58, 96, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(234, 58, 96, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(234, 58, 96, 0);
+  }
 }

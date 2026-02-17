@@ -455,13 +455,13 @@ viewVestiaireCategorie cat =
 
 viewMilestoneHeader : String -> Html Msg
 viewMilestoneHeader label =
-    div [ class "w-14 print:w-12 text-center text-[7px] font-black text-slate-400 uppercase tracking-tighter print:text-black" ] [ text label ]
+    div [ class "w-14 print:w-16 text-center text-[7px] font-black text-slate-400 uppercase tracking-tighter print:text-black print:text-[8px] print:font-black" ] [ text label ]
 
 
 viewVestiairePassage : VestiairePassage -> Html Msg
 viewVestiairePassage p =
-    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-2 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-200 print:rounded-none print:p-0 print:mb-0 print:py-1" ]
-        [ div [ class "flex-1 font-bold text-slate-800 print:text-[12px] print:font-bold uppercase pr-4" ] [ text p.nom ]
+    div [ class "group flex items-center justify-between p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-2 hover:border-[#ea3a60] transition-colors print:shadow-none print:border-b print:border-slate-300 print:rounded-none print:p-0 print:mb-0 print:py-2" ]
+        [ div [ class "flex-1 font-bold text-slate-800 print:text-[14px] print:font-black uppercase pr-4 print:text-black" ] [ text p.nom ]
         , div [ class "flex items-center gap-4 font-mono text-slate-600 print:text-black print:gap-2" ]
             [ viewMilestoneTime p.entreeV
             , viewMilestoneTime p.sortieV
@@ -474,7 +474,7 @@ viewVestiairePassage p =
 
 viewMilestoneTime : String -> Html Msg
 viewMilestoneTime time =
-    div [ class "w-14 print:w-12 text-center text-sm font-bold print:text-[11px]" ] [ text time ]
+    div [ class "w-14 print:w-16 text-center text-sm font-bold print:text-[12px] print:font-black" ] [ text time ]
 
 
 viewBuvetteCreneau : Int -> ViewCreneau -> Html Msg
