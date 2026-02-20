@@ -333,8 +333,8 @@ viewSelection model ctx =
                         , onChange SelectEquipe
                         , value model.selectedPatineurTeam
                         ]
-                        (option [ value "" ] [ text "-- Choisissez votre équipe --" ]
-                            :: List.map (\eq -> option [ value eq ] [ text eq ]) equipes
+                        (option [ value "", selected (model.selectedPatineurTeam == "") ] [ text "-- Choisissez votre équipe --" ]
+                            :: List.map (\eq -> option [ value eq, selected (eq == model.selectedPatineurTeam) ] [ text eq ]) equipes
                         )
                     , div [ class "absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" ] [ text "▼" ]
                     ]
