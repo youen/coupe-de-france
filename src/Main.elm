@@ -205,12 +205,15 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    case model.contexte of
-        Nothing ->
-            viewRoleSelection
+    div []
+        [ case model.contexte of
+            Nothing ->
+                viewRoleSelection
 
-        Just ctx ->
-            viewStandardLayout model ctx
+            Just ctx ->
+                viewStandardLayout model ctx
+        , viewDemoMode model
+        ]
 
 
 viewRoleSelection : Html Msg
@@ -278,8 +281,7 @@ viewStandardLayout model ctx =
                 [ button [ class "flex items-center gap-2 text-white/70 hover:text-[#ea3a60] font-bold transition-colors", onClick GoBack ]
                     [ span [ class "text-xl" ] [ text "←" ], text "Retour" ]
                 , div [ class "flex items-center gap-4" ]
-                    [ viewDemoMode model
-                    , case ctx of
+                    [ case ctx of
                         PourVestiaire n ->
                             if n > 0 then
                                 button [ class "btn-primary !py-1 text-xs", onClick Print ]
@@ -651,7 +653,7 @@ viewPlanning model ctx =
 
 viewDemoMode : Model -> Html Msg
 viewDemoMode model =
-    div [ class "flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/10" ]
+    div [ class "fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-[#171717] px-6 py-3 rounded-[2rem] border border-white/10 shadow-2xl print:hidden backdrop-blur-xl" ]
         [ div [ class "flex items-center gap-2" ]
             [ span [ class "text-[10px] font-black text-white/50 uppercase tracking-widest" ] [ text "Mode Démo" ]
             , input
