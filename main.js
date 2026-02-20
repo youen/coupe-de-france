@@ -4,13 +4,15 @@ import planningData from './src/planning.json'
 import benevolesData from './src/benevoles.json'
 
 const savedMissions = JSON.parse(localStorage.getItem('selectedMissions') || '[]')
+const savedTeams = JSON.parse(localStorage.getItem('selectedTeams') || '[]')
 
 const app = Elm.Main.init({
     node: document.getElementById('app'),
     flags: {
         planningData: planningData,
         benevolesData: benevolesData,
-        selectedMissions: savedMissions
+        selectedMissions: savedMissions,
+        selectedTeams: savedTeams
     }
 })
 
@@ -21,6 +23,12 @@ app.ports.print.subscribe(function () {
 if (app.ports.saveBenevoleSelection) {
     app.ports.saveBenevoleSelection.subscribe(function (selection) {
         localStorage.setItem('selectedMissions', JSON.stringify(selection))
+    })
+}
+
+if (app.ports.saveTeamsSelection) {
+    app.ports.saveTeamsSelection.subscribe(function (selection) {
+        localStorage.setItem('selectedTeams', JSON.stringify(selection))
     })
 }
 

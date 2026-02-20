@@ -35,6 +35,9 @@ port print : () -> Cmd msg
 port saveBenevoleSelection : List String -> Cmd msg
 
 
+port saveTeamsSelection : List String -> Cmd msg
+
+
 port exportCalendar : List CalendarEvent -> Cmd msg
 
 
@@ -52,6 +55,7 @@ type alias FlagsData =
     { planning : List Creneau
     , benevoles : Maybe Benevoles.Root
     , selectedMissions : List String
+    , selectedTeams : List String
     }
 
 
@@ -61,6 +65,7 @@ flagsDecoder =
         |> andMap (Decode.field "planningData" rootDecoder)
         |> andMap (Decode.maybe (Decode.field "benevolesData" Benevoles.rootDecoder))
         |> andMap (Decode.oneOf [ Decode.field "selectedMissions" (Decode.list Decode.string), Decode.succeed [] ])
+        |> andMap (Decode.oneOf [ Decode.field "selectedTeams" (Decode.list Decode.string), Decode.succeed [] ])
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
@@ -68,10 +73,10 @@ init flags =
     let
         decodedFlags =
             Decode.decodeValue flagsDecoder flags
-                |> Result.withDefault { planning = [], benevoles = Nothing, selectedMissions = [] }
+                |> Result.withDefault { planning = [], benevoles = Nothing, selectedMissions = [], selectedTeams = [] }
 
         initialContext =
-            if List.isEmpty decodedFlags.selectedMissions then
+            if List.isEmpty decodedFlags.selectedMissions && List.isEmpty decodedFlags.selectedTeams then
                 Nothing
 
             else
@@ -79,7 +84,7 @@ init flags =
     in
     ( { planning = decodedFlags.planning
       , benevoles = decodedFlags.benevoles
-      , selectedTeams = Set.empty
+      , selectedTeams = Set.fromList decodedFlags.selectedTeams
       , selectedMissions = Set.fromList decodedFlags.selectedMissions
       , contexte = initialContext
       , currentTime = Time.millisToPosix 0
@@ -106,7 +111,7 @@ update msg model =
                     else
                         Set.insert name model.selectedTeams
             in
-            ( { model | selectedTeams = newSet }, Cmd.none )
+            ( { model | selectedTeams = newSet }, saveTeamsSelection (Set.toList newSet) )
 
         ToggleMissionBenevole name ->
             let
@@ -215,7 +220,7 @@ viewRoleSelection =
             [ roleButton "Mon Planning" MonPlanning "📅" "Planning personnel regroupant vos choix"
             , roleButton "Bénévole" PourBenevole "🙋" "Sélectionnez vos missions"
             , roleButton "Patineur" (PourPatineur "") "⛸️" "Horaires personnels (Nom d'équipe)"
-            , roleButton "Coach" PourCoach "📋" "Cochez les équipes que vous suivez"
+            , roleButton "Coach / Parent / Supporter" PourCoach "📋" "Suivez une ou plusieurs équipes"
             , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Horaires par numéro de vestiaire"
             , roleButton "Buvette" PourBuvette "☕" "Alerte rushs pour la restauration"
             ]
@@ -329,10 +334,23 @@ viewSelection model ctx =
                 ]
 
         PourCoach ->
-            div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
-                [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Équipes suivies" ]
-                , div [ class "grid grid-cols-1 md:grid-cols-3 gap-3" ]
-                    (List.map (\eq -> viewCheckbox eq (Set.member eq model.selectedTeams)) equipes)
+            div [ class "space-y-6" ]
+                [ div [ class "bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
+                    [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Équipes suivies" ]
+                    , div [ class "grid grid-cols-1 md:grid-cols-3 gap-3" ]
+                        (List.map (\eq -> viewCheckbox eq (Set.member eq model.selectedTeams)) equipes)
+                    ]
+                , div [ class "p-6 bg-[#ea3a60]/5 rounded-3xl border border-[#ea3a60]/10" ]
+                    [ div [ class "flex items-center gap-3 mb-2" ]
+                        [ span [ class "text-xl" ] [ text "📅" ]
+                        , h3 [ class "text-sm font-black text-[#ea3a60] uppercase tracking-wider" ] [ text "Info Planning" ]
+                        ]
+                    , p [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                        [ text "Les horaires (vestiaire, piste, kiss & cry) des équipes sélectionnées apparaîtront automatiquement dans votre onglet "
+                        , span [ class "font-black text-slate-800" ] [ text "Mon Planning" ]
+                        , text "."
+                        ]
+                    ]
                 ]
 
         PourVestiaire vNum ->

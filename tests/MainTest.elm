@@ -26,7 +26,8 @@ suite =
                                 "edition": "Test",
                                 "postes_benevoles": []
                             },
-                            "selectedMissions": ["MISSION 1"]
+                            "selectedMissions": ["MISSION 1"],
+                            "selectedTeams": ["Equipe Test"]
                         }
                         """
 
@@ -153,5 +154,24 @@ suite =
                             Main.update (Main.ToggleMissionBenevole "M1") initialModel
                     in
                     Expect.equal newModel.selectedMissions (Set.singleton "M1")
+            , test "US: ToggleEquipeCoach updates selectedTeams in model" <|
+                \_ ->
+                    let
+                        initialModel =
+                            { planning = []
+                            , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
+                            , contexte = Just PourCoach
+                            , currentTime = Time.millisToPosix 0
+                            , zone = Time.utc
+                            , isDemoMode = False
+                            , demoTimeMinutes = 420
+                            }
+
+                        ( newModel, _ ) =
+                            Main.update (Main.ToggleEquipeCoach "Equipe A") initialModel
+                    in
+                    Expect.equal newModel.selectedTeams (Set.singleton "Equipe A")
             ]
         ]
