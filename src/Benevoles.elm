@@ -15,6 +15,12 @@ type alias Mission =
     }
 
 
+type alias Root =
+    { edition : String
+    , postesBenevoles : List Mission
+    }
+
+
 missionDecoder : Decoder Mission
 missionDecoder =
     Decode.succeed Mission
@@ -26,6 +32,13 @@ missionDecoder =
         |> andMap (Decode.field "debut" (Decode.nullable Decode.string))
         |> andMap (Decode.field "fin" (Decode.nullable Decode.string))
         |> andMap (Decode.field "icone" Decode.string)
+
+
+rootDecoder : Decoder Root
+rootDecoder =
+    Decode.succeed Root
+        |> andMap (Decode.field "edition" Decode.string)
+        |> andMap (Decode.field "postes_benevoles" (Decode.list missionDecoder))
 
 
 andMap : Decoder a -> Decoder (a -> b) -> Decoder b

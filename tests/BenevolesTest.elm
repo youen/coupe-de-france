@@ -41,4 +41,46 @@ suite =
                     Decode.decodeString missionDecoder json
                         |> Expect.equal (Ok expected)
             ]
+        , describe "rootDecoder"
+            [ test "should decode edition and list of missions" <|
+                \_ ->
+                    let
+                        json =
+                            """
+                            {
+                                "edition": "Coupe de France Nantes 2026",
+                                "postes_benevoles": [
+                                    {
+                                        "mission": "PREPA POCHETTES EQUIPES",
+                                        "periode": "AMONT",
+                                        "jour": null,
+                                        "description": "Préparation",
+                                        "lieu": "A définir",
+                                        "debut": null,
+                                        "fin": null,
+                                        "icone": "📂"
+                                    }
+                                ]
+                            }
+                            """
+
+                        expectedMission =
+                            { mission = "PREPA POCHETTES EQUIPES"
+                            , periode = "AMONT"
+                            , jour = Nothing
+                            , description = "Préparation"
+                            , lieu = "A définir"
+                            , debut = Nothing
+                            , fin = Nothing
+                            , icone = "📂"
+                            }
+
+                        expected =
+                            { edition = "Coupe de France Nantes 2026"
+                            , postesBenevoles = [ expectedMission ]
+                            }
+                    in
+                    Decode.decodeString rootDecoder json
+                        |> Expect.equal (Ok expected)
+            ]
         ]
