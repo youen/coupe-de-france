@@ -654,6 +654,7 @@ viewPlanning model ctx =
                                 , button [ class "text-[10px] font-black text-[#ea3a60] uppercase border-b border-[#ea3a60]/20 pb-0.5", onClick ExportAllMissions ] [ text "Tout exporter 📅" ]
                                 ]
                             , div [ class "space-y-3" ] (List.map (viewBenevoleMissionItem shouldMask nowMinutes) selectedMissions)
+                            , viewConfirmationButton selectedMissions
                             ]
                         ]
                     , if List.isEmpty coachHoraires then
@@ -984,6 +985,50 @@ onChange tagger =
 onClick : msg -> Attribute msg
 onClick msg =
     Html.Events.on "click" (Decode.succeed msg)
+
+
+viewConfirmationButton : List Benevoles.Mission -> Html Msg
+viewConfirmationButton selectedMissions =
+    let
+        recipient =
+            "exemple@llnp.fr"
+
+        subject =
+            "Confirmation de participation - Bénévole CDF Synchro 2026"
+
+        missionLine m =
+            "- " ++ m.mission ++ " (" ++ m.periode ++ (m.debut |> Maybe.map (\d -> " à " ++ d) |> Maybe.withDefault "") ++ ")"
+
+        body =
+            "Bonjour,\n\nJe confirme ma participation pour les missions suivantes :\n\n"
+                ++ String.join "\n" (List.map missionLine selectedMissions)
+                ++ "\n\nNom / Prénom : [À COMPLÉTER]\n\nCordialement."
+
+        -- Manual URI encoding for basics
+        encode s =
+            s
+                |> String.replace "%" "%25"
+                |> String.replace " " "%20"
+                |> String.replace "\n" "%0D%0A"
+                |> String.replace "é" "%C3%A9"
+                |> String.replace "à" "%C3%A0"
+                |> String.replace "è" "%C3%A8"
+                |> String.replace "ê" "%C3%AA"
+                |> String.replace "ç" "%C3%A7"
+
+        url =
+            "mailto:" ++ recipient ++ "?subject=" ++ encode subject ++ "&body=" ++ encode body
+    in
+    div [ class "mt-8 print:hidden" ]
+        [ a
+            [ href url
+            , class "flex items-center justify-center gap-3 w-full py-4 bg-[#171717] text-white rounded-2xl font-black shadow-lg hover:bg-[#ea3a60] transition-all active:scale-95"
+            ]
+            [ span [ class "text-xl" ] [ text "✉️" ]
+            , text "CONFIRMER PAR EMAIL"
+            ]
+        , p [ class "text-[10px] text-center text-slate-400 mt-2 font-medium" ] [ text "Envoie votre sélection par mail au responsable" ]
+        ]
 
 
 main : Program Decode.Value Model Msg
