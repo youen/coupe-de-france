@@ -836,8 +836,19 @@ viewBuvetteCreneau nowMinutes creneau =
 viewBenevoleMissionItem : Int -> Benevoles.Mission -> Html Msg
 viewBenevoleMissionItem nowMinutes mission =
     let
-        timeStr =
-            mission.debut |> Maybe.withDefault "--:--"
+        timeRangeStr =
+            case ( mission.debut, mission.fin ) of
+                ( Just s, Just e ) ->
+                    s ++ " - " ++ e
+
+                ( Just s, Nothing ) ->
+                    s
+
+                ( Nothing, Just e ) ->
+                    "?? - " ++ e
+
+                _ ->
+                    "--:--"
 
         timeMinutes =
             case mission.debut of
@@ -893,8 +904,8 @@ viewBenevoleMissionItem nowMinutes mission =
                 span [ class "px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md" ] [ text "📍 PETIT PORT" ]
     in
     div [ class ("group flex items-center gap-6 p-5 border border-slate-100 bg-white rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 " ++ borderL ++ opacityClass) ]
-        [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6" ]
-            [ div [ class "text-xl font-black text-[#1d1d1d] font-mono tracking-tight" ] [ text timeStr ]
+        [ div [ class "flex-shrink-0 w-28 flex flex-col items-center justify-center border-r border-slate-100 pr-6" ]
+            [ div [ class "text-sm font-black text-[#1d1d1d] font-mono tracking-tighter whitespace-nowrap" ] [ text timeRangeStr ]
             , div [ class "text-2xl mt-1" ] [ text mission.icone ]
             ]
         , div [ class "flex-1 overflow-hidden" ]
