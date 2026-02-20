@@ -438,7 +438,9 @@ viewSelection model ctx =
                             , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
                                 [ text "N'oubliez pas d'"
                                 , span [ class "font-black text-slate-800" ] [ text "ajouter les horaires" ]
-                                , text " dans votre agenda personnel."
+                                , text " dans votre agenda en cliquant sur l'icône calendrier "
+                                , span [ class "font-black text-slate-800" ] [ text "📅" ]
+                                , text "."
                                 ]
                             ]
                         ]
