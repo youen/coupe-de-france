@@ -419,7 +419,14 @@ viewMissionCheckbox mission isChecked =
                         text ""
                     ]
                 ]
-            , div [ class "text-xs font-medium text-slate-500 truncate" ] [ text mission.lieu ]
+            , div [ class "flex items-center gap-2 mb-1" ]
+                [ if String.contains "REZE" (String.toUpper mission.lieu) then
+                    span [ class "px-1.5 py-0.5 bg-purple-100 text-purple-600 text-[8px] font-black rounded uppercase" ] [ text "📍 Rezé" ]
+
+                  else
+                    span [ class "px-1.5 py-0.5 bg-blue-50 text-blue-500 text-[8px] font-black rounded uppercase" ] [ text "📍 Petit Port" ]
+                ]
+            , div [ class "text-[10px] font-medium text-slate-400 line-clamp-1" ] [ text mission.description ]
             ]
         ]
 
@@ -756,6 +763,13 @@ viewBenevoleMissionItem nowMinutes mission =
 
             else
                 " border-l-[12px] border-l-slate-200"
+
+        locationBadge =
+            if String.contains "REZE" (String.toUpper mission.lieu) then
+                span [ class "px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-black rounded-md" ] [ text "📍 REZÉ" ]
+
+            else
+                span [ class "px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md" ] [ text "📍 PETIT PORT" ]
     in
     div [ class ("group flex items-center gap-6 p-5 border border-slate-100 bg-white rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 " ++ borderL ++ opacityClass) ]
         [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6" ]
@@ -764,7 +778,11 @@ viewBenevoleMissionItem nowMinutes mission =
             ]
         , div [ class "flex-1 overflow-hidden" ]
             [ div [ class "text-lg font-black leading-tight mb-0.5 text-slate-700 uppercase" ] [ text mission.mission ]
-            , div [ class "text-xs font-bold text-slate-400 uppercase tracking-widest" ] [ text (mission.periode ++ " - " ++ mission.lieu) ]
+            , div [ class "text-sm font-medium text-slate-500 mb-2 line-clamp-2" ] [ text mission.description ]
+            , div [ class "flex items-center gap-3" ]
+                [ locationBadge
+                , div [ class "text-[10px] font-bold text-slate-300 uppercase tracking-widest" ] [ text mission.periode ]
+                ]
             ]
         , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors" ] []
         ]
