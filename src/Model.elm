@@ -71,6 +71,7 @@ type UserContext
     | PourCoach (Set.Set String)
     | PourBuvette
     | PourVestiaire Int
+    | PourBenevole (Set.Set String)
 
 
 type alias Model =
