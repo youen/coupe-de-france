@@ -42,49 +42,87 @@ rootDecoder =
         |> andMap (Decode.field "postes_benevoles" (Decode.list missionDecoder))
 
 
+periodeOrder : List String
+periodeOrder =
+    [ "AMONT", "VENDREDI", "SAMEDI", "DIMANCHE" ]
+
+
+elemIndex : a -> List a -> Maybe Int
+elemIndex item list =
+    let
+        find idx l =
+            case l of
+                [] ->
+                    Nothing
+
+                x :: xs ->
+                    if x == item then
+                        Just idx
+
+                    else
+                        find (idx + 1) xs
+    in
+    find 0 list
+
+
+comparePeriodes : String -> String -> Order
+comparePeriodes a b =
+    let
+        indexA =
+            elemIndex a periodeOrder |> Maybe.withDefault 99
+
+        indexB =
+            elemIndex b periodeOrder |> Maybe.withDefault 99
+    in
+    compare indexA indexB
+
+
 getPeriodes : List Mission -> List String
 getPeriodes missions =
+    missions
+        |> List.map .periode
+        |> Set.fromList
+        |> Set.toList
+        |> List.sortWith comparePeriodes
+
+
+getMissionsSelectionnees : Set.Set String -> List Mission -> List Mission
+getMissionsSelectionnees selection missions =
     let
-        allPeriodes =
-            missions
-                |> List.map .periode
-                |> Set.fromList
-                |> Set.toList
-
-        -- Define desired order
-        order =
-            [ "AMONT", "VENDREDI", "SAMEDI", "DIMANCHE" ]
-
-        -- Helper function
-        elemIndex : a -> List a -> Maybe Int
-        elemIndex item list =
-            let
-                find idx l =
-                    case l of
-                        [] ->
-                            Nothing
-
-                        x :: xs ->
-                            if x == item then
-                                Just idx
-
-                            else
-                                find (idx + 1) xs
-            in
-            find 0 list
-
-        -- Sort function using the index in the order list
         sortFn a b =
-            let
-                indexA =
-                    elemIndex a order |> Maybe.withDefault 99
+            case comparePeriodes a.periode b.periode of
+                EQ ->
+                    compare (Maybe.withDefault "24:00" a.debut) (Maybe.withDefault "24:00" b.debut)
 
-                indexB =
-                    elemIndex b order |> Maybe.withDefault 99
-            in
-            compare indexA indexB
+                other ->
+                    other
     in
-    allPeriodes |> List.sortWith sortFn
+    missions
+        |> List.filter (\m -> Set.member m.mission selection)
+        |> List.sortWith sortFn
+
+
+estMissionPertinente : Int -> Mission -> Bool
+estMissionPertinente nowMinutes mission =
+    if mission.periode /= "SAMEDI" then
+        True
+
+    else
+        case mission.fin of
+            Just finStr ->
+                case String.split ":" finStr of
+                    [ h, m ] ->
+                        let
+                            finMinutes =
+                                (String.toInt h |> Maybe.withDefault 0) * 60 + (String.toInt m |> Maybe.withDefault 0)
+                        in
+                        nowMinutes < finMinutes + 20
+
+                    _ ->
+                        True
+
+            Nothing ->
+                True
 
 
 andMap : Decoder a -> Decoder (a -> b) -> Decoder b
