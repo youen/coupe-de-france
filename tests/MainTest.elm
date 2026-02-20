@@ -37,7 +37,7 @@ suite =
                     ( newModel, _ ) =
                         Main.init flagsValue
                 in
-                Expect.equal newModel.contexte (Just (PourBenevole (Set.singleton "MISSION 1")))
+                Expect.equal newModel.contexte (Just PourBenevole)
         , describe "update"
             [ test "Print message should returned in a command (non-testable directly easily, but we can check state transitions)" <|
                 \_ ->
@@ -45,6 +45,8 @@ suite =
                         initialModel =
                             { planning = []
                             , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -52,7 +54,6 @@ suite =
                             , demoTimeMinutes = 420
                             }
 
-                        -- This is a placeholder since we can't easily test Cmd.none vs Cmd port
                         ( newModel, _ ) =
                             Main.update Main.Print initialModel
                     in
@@ -63,6 +64,8 @@ suite =
                         initialModel =
                             { planning = []
                             , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -80,6 +83,8 @@ suite =
                         initialModel =
                             { planning = []
                             , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -97,6 +102,8 @@ suite =
                         initialModel =
                             { planning = []
                             , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
                             , contexte = Just (PourVestiaire 0)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -108,13 +115,15 @@ suite =
                             Main.update Main.GoBack initialModel
                     in
                     Expect.equal newModel.contexte Nothing
-            , test "US1: ToggleMissionBenevole adds a mission to the set when not present" <|
+            , test "US: Can switch to MonPlanning context" <|
                 \_ ->
                     let
                         initialModel =
                             { planning = []
                             , benevoles = Nothing
-                            , contexte = Just (PourBenevole Set.empty)
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
+                            , contexte = Nothing
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
                             , isDemoMode = False
@@ -122,16 +131,18 @@ suite =
                             }
 
                         ( newModel, _ ) =
-                            Main.update (Main.ToggleMissionBenevole "PREPA POCHETTES") initialModel
+                            Main.update (Main.SetContexte MonPlanning) initialModel
                     in
-                    Expect.equal newModel.contexte (Just (PourBenevole (Set.singleton "PREPA POCHETTES")))
-            , test "US1: ToggleMissionBenevole removes a mission from the set when present" <|
+                    Expect.equal newModel.contexte (Just MonPlanning)
+            , test "US: ToggleMissionBenevole updates selectedMissions in model" <|
                 \_ ->
                     let
                         initialModel =
                             { planning = []
                             , benevoles = Nothing
-                            , contexte = Just (PourBenevole (Set.singleton "PREPA POCHETTES"))
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
+                            , contexte = Just PourBenevole
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
                             , isDemoMode = False
@@ -139,8 +150,8 @@ suite =
                             }
 
                         ( newModel, _ ) =
-                            Main.update (Main.ToggleMissionBenevole "PREPA POCHETTES") initialModel
+                            Main.update (Main.ToggleMissionBenevole "M1") initialModel
                     in
-                    Expect.equal newModel.contexte (Just (PourBenevole Set.empty))
+                    Expect.equal newModel.selectedMissions (Set.singleton "M1")
             ]
         ]

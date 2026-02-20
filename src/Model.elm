@@ -68,15 +68,18 @@ type alias Creneau =
 
 type UserContext
     = PourPatineur String
-    | PourCoach (Set.Set String)
+    | PourCoach
     | PourBuvette
     | PourVestiaire Int
-    | PourBenevole (Set.Set String)
+    | PourBenevole
+    | MonPlanning
 
 
 type alias Model =
     { planning : List Creneau
     , benevoles : Maybe Benevoles.Root
+    , selectedTeams : Set.Set String
+    , selectedMissions : Set.Set String
     , contexte : Maybe UserContext
     , currentTime : Time.Posix
     , zone : Time.Zone

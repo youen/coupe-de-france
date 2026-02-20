@@ -75,10 +75,12 @@ init flags =
                 Nothing
 
             else
-                Just (PourBenevole (Set.fromList decodedFlags.selectedMissions))
+                Just PourBenevole
     in
     ( { planning = decodedFlags.planning
       , benevoles = decodedFlags.benevoles
+      , selectedTeams = Set.empty
+      , selectedMissions = Set.fromList decodedFlags.selectedMissions
       , contexte = initialContext
       , currentTime = Time.millisToPosix 0
       , zone = Time.utc
@@ -96,40 +98,26 @@ update msg model =
             ( { model | contexte = Just (PourPatineur name) }, Cmd.none )
 
         ToggleEquipeCoach name ->
-            case model.contexte of
-                Just (PourCoach set) ->
-                    let
-                        newSet =
-                            if Set.member name set then
-                                Set.remove name set
+            let
+                newSet =
+                    if Set.member name model.selectedTeams then
+                        Set.remove name model.selectedTeams
 
-                            else
-                                Set.insert name set
-                    in
-                    ( { model | contexte = Just (PourCoach newSet) }, Cmd.none )
-
-                _ ->
-                    ( { model | contexte = Just (PourCoach (Set.singleton name)) }, Cmd.none )
+                    else
+                        Set.insert name model.selectedTeams
+            in
+            ( { model | selectedTeams = newSet }, Cmd.none )
 
         ToggleMissionBenevole name ->
-            case model.contexte of
-                Just (PourBenevole set) ->
-                    let
-                        newSet =
-                            if Set.member name set then
-                                Set.remove name set
+            let
+                newSet =
+                    if Set.member name model.selectedMissions then
+                        Set.remove name model.selectedMissions
 
-                            else
-                                Set.insert name set
-                    in
-                    ( { model | contexte = Just (PourBenevole newSet) }, saveBenevoleSelection (Set.toList newSet) )
-
-                _ ->
-                    let
-                        newSet =
-                            Set.singleton name
-                    in
-                    ( { model | contexte = Just (PourBenevole newSet) }, saveBenevoleSelection (Set.toList newSet) )
+                    else
+                        Set.insert name model.selectedMissions
+            in
+            ( { model | selectedMissions = newSet }, saveBenevoleSelection (Set.toList newSet) )
 
         SelectVestiaire vNum ->
             ( { model | contexte = Just (PourVestiaire vNum) }, Cmd.none )
@@ -181,32 +169,27 @@ update msg model =
             )
 
         ExportAllMissions ->
-            case model.contexte of
-                Just (PourBenevole set) ->
-                    let
-                        missions =
-                            model.benevoles
-                                |> Maybe.map .postesBenevoles
-                                |> Maybe.withDefault []
-                                |> List.filter (\m -> Set.member m.mission set)
+            let
+                missions =
+                    model.benevoles
+                        |> Maybe.map .postesBenevoles
+                        |> Maybe.withDefault []
+                        |> List.filter (\m -> Set.member m.mission model.selectedMissions)
 
-                        events =
-                            missions
-                                |> List.map
-                                    (\m ->
-                                        { title = m.mission
-                                        , day = m.jour
-                                        , startTime = m.debut
-                                        , endTime = m.fin
-                                        , description = m.description
-                                        , location = m.lieu
-                                        }
-                                    )
-                    in
-                    ( model, exportCalendar events )
-
-                _ ->
-                    ( model, Cmd.none )
+                events =
+                    missions
+                        |> List.map
+                            (\m ->
+                                { title = m.mission
+                                , day = m.jour
+                                , startTime = m.debut
+                                , endTime = m.fin
+                                , description = m.description
+                                , location = m.lieu
+                                }
+                            )
+            in
+            ( model, exportCalendar events )
 
 
 view : Model -> Html Msg
@@ -229,11 +212,12 @@ viewRoleSelection =
             , p [ class "text-[#1d1d1d] font-medium opacity-60" ] [ text "Choisissez votre accès au planning" ]
             ]
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
-            [ roleButton "Bénévole" (PourBenevole Set.empty) "🙋" "Consultez vos missions et horaires"
-            , roleButton "Patineur" (PourPatineur "") "⛸️" "Consultez vos horaires personnels"
-            , roleButton "Coach" (PourCoach Set.empty) "📋" "Gérez plusieurs équipes simultanément"
-            , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Impression pour les portes des vestiaires"
-            , roleButton "Buvette" PourBuvette "☕" "Anticipez les rushs de surfaçage"
+            [ roleButton "Mon Planning" MonPlanning "📅" "Planning personnel regroupant vos choix"
+            , roleButton "Bénévole" PourBenevole "🙋" "Sélectionnez vos missions"
+            , roleButton "Patineur" (PourPatineur "") "⛸️" "Horaires personnels (Nom d'équipe)"
+            , roleButton "Coach" PourCoach "📋" "Cochez les équipes que vous suivez"
+            , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Horaires par numéro de vestiaire"
+            , roleButton "Buvette" PourBuvette "☕" "Alerte rushs pour la restauration"
             ]
         ]
 
@@ -264,11 +248,14 @@ viewStandardLayout model ctx =
                 PourPatineur _ ->
                     "context-patineur"
 
-                PourCoach _ ->
+                PourCoach ->
                     "context-coach"
 
-                PourBenevole _ ->
+                PourBenevole ->
                     "context-benevole"
+
+                MonPlanning ->
+                    "context-mon-planning"
 
                 PourBuvette ->
                     "context-buvette"
@@ -341,11 +328,11 @@ viewSelection model ctx =
                     ]
                 ]
 
-        PourCoach set ->
+        PourCoach ->
             div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
                 [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Équipes suivies" ]
-                , div [ class "grid grid-cols-2 md:grid-cols-3 gap-3" ]
-                    (List.map (\eq -> viewCheckbox eq (Set.member eq set)) equipes)
+                , div [ class "grid grid-cols-1 md:grid-cols-3 gap-3" ]
+                    (List.map (\eq -> viewCheckbox eq (Set.member eq model.selectedTeams)) equipes)
                 ]
 
         PourVestiaire vNum ->
@@ -375,8 +362,11 @@ viewSelection model ctx =
         PourBuvette ->
             text ""
 
-        PourBenevole set ->
+        PourBenevole ->
             let
+                set =
+                    model.selectedMissions
+
                 missions =
                     model.benevoles
                         |> Maybe.map .postesBenevoles
@@ -385,28 +375,28 @@ viewSelection model ctx =
                 periodes =
                     Benevoles.getPeriodes missions
             in
-            div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
-                [ h2 [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Sélectionnez vos missions" ]
-                , div [ class "space-y-6" ]
-                    (List.map
-                        (\periode ->
-                            let
-                                periodeMissions =
-                                    missions
-                                        |> List.filter (\m -> m.periode == periode)
-                            in
-                            div [ class "space-y-3" ]
-                                [ div [ class "flex items-center gap-3" ]
-                                    [ h3 [ class "text-sm font-black text-slate-800 uppercase tracking-wider" ] [ text periode ]
-                                    , div [ class "h-px bg-slate-100 flex-1" ] []
-                                    ]
-                                , div [ class "grid grid-cols-1 md:grid-cols-2 gap-3" ]
-                                    (List.map (\m -> viewMissionCheckbox m (Set.member m.mission set)) periodeMissions)
+            div [ class "flex flex-col gap-8" ]
+                (List.map
+                    (\periode ->
+                        let
+                            periodeMissions =
+                                missions
+                                    |> List.filter (\m -> m.periode == periode)
+                        in
+                        div [ class "bg-slate-50/50 p-6 rounded-[2.5rem] border border-slate-100" ]
+                            [ div [ class "flex items-center gap-3 mb-6 px-2" ]
+                                [ span [ class "text-sm font-black text-slate-400 uppercase tracking-widest" ] [ text periode ]
+                                , div [ class "h-px flex-1 bg-slate-200/50" ] []
                                 ]
-                        )
-                        periodes
+                            , div [ class "grid grid-cols-1 md:grid-cols-2 gap-3" ]
+                                (List.map (\m -> viewMissionCheckbox m (Set.member m.mission set)) periodeMissions)
+                            ]
                     )
-                ]
+                    periodes
+                )
+
+        MonPlanning ->
+            text ""
 
 
 viewMissionCheckbox : Benevoles.Mission -> Bool -> Html Msg
@@ -528,12 +518,12 @@ viewPlanning model ctx =
             getHorairesPatineur teamName relevantPlanning
                 |> List.map (viewCreneauWithTime nowMinutes)
 
-        PourCoach set ->
-            if Set.isEmpty set then
+        PourCoach ->
+            if Set.isEmpty model.selectedTeams then
                 [ div [ class "text-center py-10 text-gray-500" ] [ text "Veuillez sélectionner au moins une équipe." ] ]
 
             else
-                getHorairesCoach set relevantPlanning
+                getHorairesCoach model.selectedTeams relevantPlanning
                     |> List.map (viewCreneauWithTime nowMinutes)
 
         PourBuvette ->
@@ -548,7 +538,10 @@ viewPlanning model ctx =
                 getHorairesVestiaireGrouped vNum model.planning
                     |> List.concatMap viewVestiaireCategorie
 
-        PourBenevole set ->
+        PourBenevole ->
+            [ div [ class "text-center py-10 text-gray-500" ] [ text "Sélectionnez vos missions dans l'onglet 'Bénévole' (en bas)." ] ]
+
+        MonPlanning ->
             let
                 missions =
                     model.benevoles
@@ -556,18 +549,51 @@ viewPlanning model ctx =
                         |> Maybe.withDefault []
 
                 selectedMissions =
-                    Benevoles.getMissionsSelectionnees set missions
+                    Benevoles.getMissionsSelectionnees model.selectedMissions missions
                         |> List.filter (Benevoles.estMissionPertinente nowMinutes)
+
+                coachHoraires =
+                    getHorairesCoach model.selectedTeams relevantPlanning
+
+                -- Convert missions to ViewCreneau to sort them together?
+                -- Or just show them in two groups? Sorting together is better.
+                -- For now let's just group them for simplicity, then we can improve.
             in
-            if List.isEmpty selectedMissions then
-                [ div [ class "text-center py-10 text-gray-400" ] [ text "Aucune mission sélectionnée ou à venir." ] ]
+            if List.isEmpty selectedMissions && List.isEmpty coachHoraires then
+                [ div [ class "text-center py-10" ]
+                    [ div [ class "text-4xl mb-4" ] [ text "📅" ]
+                    , div [ class "text-gray-500 font-medium" ] [ text "Votre planning est vide." ]
+                    , div [ class "text-sm text-gray-400 mt-2" ] [ text "Sélectionnez des missions ou des équipes pour les voir ici." ]
+                    ]
+                ]
 
             else
-                div [ class "flex justify-end mb-6" ]
-                    [ button [ class "flex items-center gap-2 px-6 py-3 bg-black text-white rounded-2xl font-black text-sm hover:bg-[#ea3a60] transition-colors shadow-lg active:scale-95", onClick ExportAllMissions ]
-                        [ text "📅 TOUT EXPORTER" ]
+                List.concat
+                    [ if List.isEmpty selectedMissions then
+                        []
+
+                      else
+                        [ div [ class "mb-8" ]
+                            [ div [ class "flex items-center justify-between mb-4 px-2" ]
+                                [ h2 [ class "text-sm font-black text-slate-800 uppercase tracking-widest" ] [ text "Mes Missions" ]
+                                , button [ class "text-[10px] font-black text-[#ea3a60] uppercase border-b border-[#ea3a60]/20 pb-0.5", onClick ExportAllMissions ] [ text "Tout exporter 📅" ]
+                                ]
+                            , div [ class "space-y-3" ] (List.map (viewBenevoleMissionItem nowMinutes) selectedMissions)
+                            ]
+                        ]
+                    , if List.isEmpty coachHoraires then
+                        []
+
+                      else
+                        [ div [ class "mb-8" ]
+                            [ div [ class "flex items-center mb-4 px-2" ]
+                                [ h2 [ class "text-sm font-black text-slate-800 uppercase tracking-widest" ] [ text "Mes Équipes" ]
+                                , div [ class "ml-3 h-px flex-1 bg-slate-100" ] []
+                                ]
+                            , div [ class "space-y-3" ] (List.map (viewCreneauWithTime nowMinutes) coachHoraires)
+                            ]
+                        ]
                     ]
-                    :: List.map (viewBenevoleMissionItem nowMinutes) selectedMissions
 
 
 viewDemoMode : Model -> Html Msg

@@ -3,6 +3,7 @@ module DemoTest exposing (..)
 import Expect
 import Main exposing (Msg(..))
 import Model exposing (..)
+import Set
 import Test exposing (..)
 import Time
 
@@ -20,6 +21,8 @@ suite =
                     model =
                         { planning = []
                         , benevoles = Nothing
+                        , selectedTeams = Set.empty
+                        , selectedMissions = Set.empty
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0 -- irrelevant here
                         , zone = Time.utc
@@ -46,6 +49,8 @@ suite =
                     model =
                         { planning = []
                         , benevoles = Nothing
+                        , selectedTeams = Set.empty
+                        , selectedMissions = Set.empty
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0
                         , zone = Time.utc

@@ -3,6 +3,7 @@ module TickTest exposing (..)
 import Expect
 import Main exposing (Msg(..), update)
 import Model exposing (..)
+import Set
 import Test exposing (..)
 import Time
 
@@ -16,6 +17,8 @@ suite =
                     initialModel =
                         { planning = []
                         , benevoles = Nothing
+                        , selectedTeams = Set.empty
+                        , selectedMissions = Set.empty
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0
                         , zone = Time.utc
