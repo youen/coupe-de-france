@@ -466,8 +466,16 @@ viewPlanning model ctx =
                 getHorairesVestiaireGrouped vNum model.planning
                     |> List.concatMap viewVestiaireCategorie
 
-        PourBenevole _ ->
-            [ div [ class "text-center py-10" ] [ text "WIP Liste missions bénévole" ] ]
+        PourBenevole set ->
+            let
+                missions =
+                    model.benevoles
+                        |> Maybe.map .postesBenevoles
+                        |> Maybe.withDefault []
+            in
+            Benevoles.getMissionsSelectionnees set missions
+                |> List.filter (Benevoles.estMissionPertinente nowMinutes)
+                |> List.map (viewBenevoleMissionItem nowMinutes)
 
 
 viewDemoMode : Model -> Html Msg
@@ -671,6 +679,71 @@ viewBuvetteCreneau nowMinutes creneau =
                 ]
             ]
         , div [ class "z-10 w-2 h-16 bg-red-500 rounded-full" ] []
+        ]
+
+
+viewBenevoleMissionItem : Int -> Benevoles.Mission -> Html Msg
+viewBenevoleMissionItem nowMinutes mission =
+    let
+        timeStr =
+            mission.debut |> Maybe.withDefault "--:--"
+
+        timeMinutes =
+            case mission.debut of
+                Just t ->
+                    case String.split ":" t of
+                        [ h, m ] ->
+                            (String.toInt h |> Maybe.withDefault 0) * 60 + (String.toInt m |> Maybe.withDefault 0)
+
+                        _ ->
+                            0
+
+                Nothing ->
+                    0
+
+        isPast =
+            mission.periode
+                == "SAMEDI"
+                && (case mission.fin of
+                        Just t ->
+                            case String.split ":" t of
+                                [ h, m ] ->
+                                    nowMinutes > ((String.toInt h |> Maybe.withDefault 0) * 60 + (String.toInt m |> Maybe.withDefault 0))
+
+                                _ ->
+                                    False
+
+                        Nothing ->
+                            False
+                   )
+
+        opacityClass =
+            if isPast then
+                " event-past"
+
+            else if (timeMinutes - nowMinutes) <= 10 && (timeMinutes - nowMinutes) >= 0 then
+                " event-imminent"
+
+            else
+                ""
+
+        borderL =
+            if mission.periode == "SAMEDI" then
+                " border-l-[12px] border-l-[#ea3a60]"
+
+            else
+                " border-l-[12px] border-l-slate-200"
+    in
+    div [ class ("group flex items-center gap-6 p-5 border border-slate-100 bg-white rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 " ++ borderL ++ opacityClass) ]
+        [ div [ class "flex-shrink-0 w-20 flex flex-col items-center justify-center border-r border-slate-100 pr-6" ]
+            [ div [ class "text-xl font-black text-[#1d1d1d] font-mono tracking-tight" ] [ text timeStr ]
+            , div [ class "text-2xl mt-1" ] [ text mission.icone ]
+            ]
+        , div [ class "flex-1 overflow-hidden" ]
+            [ div [ class "text-lg font-black leading-tight mb-0.5 text-slate-700 uppercase" ] [ text mission.mission ]
+            , div [ class "text-xs font-bold text-slate-400 uppercase tracking-widest" ] [ text (mission.periode ++ " - " ++ mission.lieu) ]
+            ]
+        , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors" ] []
         ]
 
 
