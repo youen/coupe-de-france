@@ -492,6 +492,26 @@ viewMissionCheckbox mission isChecked =
 
                   else
                     span [ class "px-1.5 py-0.5 bg-blue-50 text-blue-500 text-[8px] font-black rounded uppercase" ] [ text "📍 Petit Port" ]
+                , let
+                    timeRange =
+                        case ( mission.debut, mission.fin ) of
+                            ( Just s, Just e ) ->
+                                s ++ " - " ++ e
+
+                            ( Just s, Nothing ) ->
+                                s
+
+                            ( Nothing, Just e ) ->
+                                "?? - " ++ e
+
+                            _ ->
+                                ""
+                  in
+                  if timeRange == "" then
+                    text ""
+
+                  else
+                    span [ class "px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-black rounded uppercase" ] [ text ("🕒 " ++ timeRange) ]
                 ]
             , div [ class "text-[10px] font-medium text-slate-400 line-clamp-1" ] [ text mission.description ]
             ]
