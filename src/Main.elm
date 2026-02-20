@@ -227,9 +227,9 @@ viewRoleSelection =
             ]
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
             [ roleButton "Mon Planning" MonPlanning "📅" "Planning personnel regroupant vos choix"
-            , roleButton "Bénévole" PourBenevole "🙋" "Sélectionnez vos missions"
             , roleButton "Patineur" PourPatineur "⛸️" "Horaires personnels (Nom d'équipe)"
             , roleButton "Coach / Parent / Supporter" PourCoach "📋" "Suivez une ou plusieurs équipes"
+            , roleButton "Bénévole" PourBenevole "🙋" "Sélectionnez vos missions"
             , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Horaires par numéro de vestiaire"
             , roleButton "Buvette" PourBuvette "☕" "Alerte rushs pour la restauration"
             ]
