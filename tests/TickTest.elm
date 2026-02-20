@@ -19,6 +19,7 @@ suite =
                         , benevoles = Nothing
                         , selectedTeams = Set.empty
                         , selectedMissions = Set.empty
+                        , selectedPatineurTeam = ""
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0
                         , zone = Time.utc

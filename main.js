@@ -5,6 +5,7 @@ import benevolesData from './src/benevoles.json'
 
 const savedMissions = JSON.parse(localStorage.getItem('selectedMissions') || '[]')
 const savedTeams = JSON.parse(localStorage.getItem('selectedTeams') || '[]')
+const savedPatineurTeam = localStorage.getItem('selectedPatineurTeam') || ''
 
 const app = Elm.Main.init({
     node: document.getElementById('app'),
@@ -12,7 +13,8 @@ const app = Elm.Main.init({
         planningData: planningData,
         benevolesData: benevolesData,
         selectedMissions: savedMissions,
-        selectedTeams: savedTeams
+        selectedTeams: savedTeams,
+        selectedPatineurTeam: savedPatineurTeam
     }
 })
 
@@ -29,6 +31,12 @@ if (app.ports.saveBenevoleSelection) {
 if (app.ports.saveTeamsSelection) {
     app.ports.saveTeamsSelection.subscribe(function (selection) {
         localStorage.setItem('selectedTeams', JSON.stringify(selection))
+    })
+}
+
+if (app.ports.savePatineurTeam) {
+    app.ports.savePatineurTeam.subscribe(function (team) {
+        localStorage.setItem('selectedPatineurTeam', team)
     })
 }
 
@@ -76,9 +84,7 @@ function generateICS(events) {
             lines.push(`DTEND;VALUE=DATE:${dtEnd}`);
         } else {
             // US10: Event without day (AMONT). 
-            // We use a fixed day for the "Amont" part (e.g. April 2nd) or just skip if we want to be safe.
-            // But the US says "export as whole day event".
-            // Let's use 2026-04-02 for AMONT if possible.
+            // Let's use 2026-04-02 for AMONT.
             const amontDay = '20260402';
             lines.push(`DTSTART;VALUE=DATE:${amontDay}`);
             lines.push(`DTEND;VALUE=DATE:20260403`);

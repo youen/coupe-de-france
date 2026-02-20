@@ -67,7 +67,7 @@ type alias Creneau =
 
 
 type UserContext
-    = PourPatineur String
+    = PourPatineur
     | PourCoach
     | PourBuvette
     | PourVestiaire Int
@@ -80,6 +80,7 @@ type alias Model =
     , benevoles : Maybe Benevoles.Root
     , selectedTeams : Set.Set String
     , selectedMissions : Set.Set String
+    , selectedPatineurTeam : String
     , contexte : Maybe UserContext
     , currentTime : Time.Posix
     , zone : Time.Zone

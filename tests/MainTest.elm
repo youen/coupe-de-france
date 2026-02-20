@@ -27,7 +27,8 @@ suite =
                                 "postes_benevoles": []
                             },
                             "selectedMissions": ["MISSION 1"],
-                            "selectedTeams": ["Equipe Test"]
+                            "selectedTeams": ["Equipe Test"],
+                            "selectedPatineurTeam": "Patineur Test"
                         }
                         """
 
@@ -48,6 +49,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -67,6 +69,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -86,6 +89,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -105,6 +109,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Just (PourVestiaire 0)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -124,6 +129,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Nothing
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -143,6 +149,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Just PourBenevole
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -162,6 +169,7 @@ suite =
                             , benevoles = Nothing
                             , selectedTeams = Set.empty
                             , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
                             , contexte = Just PourCoach
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -173,5 +181,25 @@ suite =
                             Main.update (Main.ToggleEquipeCoach "Equipe A") initialModel
                     in
                     Expect.equal newModel.selectedTeams (Set.singleton "Equipe A")
+            , test "US: SelectEquipe updates selectedPatineurTeam in model" <|
+                \_ ->
+                    let
+                        initialModel =
+                            { planning = []
+                            , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
+                            , contexte = Just PourPatineur
+                            , currentTime = Time.millisToPosix 0
+                            , zone = Time.utc
+                            , isDemoMode = False
+                            , demoTimeMinutes = 420
+                            }
+
+                        ( newModel, _ ) =
+                            Main.update (Main.SelectEquipe "Equipe B") initialModel
+                    in
+                    Expect.equal newModel.selectedPatineurTeam "Equipe B"
             ]
         ]

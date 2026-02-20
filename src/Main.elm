@@ -38,6 +38,9 @@ port saveBenevoleSelection : List String -> Cmd msg
 port saveTeamsSelection : List String -> Cmd msg
 
 
+port savePatineurTeam : String -> Cmd msg
+
+
 port exportCalendar : List CalendarEvent -> Cmd msg
 
 
@@ -56,6 +59,7 @@ type alias FlagsData =
     , benevoles : Maybe Benevoles.Root
     , selectedMissions : List String
     , selectedTeams : List String
+    , selectedPatineurTeam : String
     }
 
 
@@ -66,6 +70,7 @@ flagsDecoder =
         |> andMap (Decode.maybe (Decode.field "benevolesData" Benevoles.rootDecoder))
         |> andMap (Decode.oneOf [ Decode.field "selectedMissions" (Decode.list Decode.string), Decode.succeed [] ])
         |> andMap (Decode.oneOf [ Decode.field "selectedTeams" (Decode.list Decode.string), Decode.succeed [] ])
+        |> andMap (Decode.oneOf [ Decode.field "selectedPatineurTeam" Decode.string, Decode.succeed "" ])
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
@@ -73,10 +78,10 @@ init flags =
     let
         decodedFlags =
             Decode.decodeValue flagsDecoder flags
-                |> Result.withDefault { planning = [], benevoles = Nothing, selectedMissions = [], selectedTeams = [] }
+                |> Result.withDefault { planning = [], benevoles = Nothing, selectedMissions = [], selectedTeams = [], selectedPatineurTeam = "" }
 
         initialContext =
-            if List.isEmpty decodedFlags.selectedMissions && List.isEmpty decodedFlags.selectedTeams then
+            if List.isEmpty decodedFlags.selectedMissions && List.isEmpty decodedFlags.selectedTeams && decodedFlags.selectedPatineurTeam == "" then
                 Nothing
 
             else
@@ -86,6 +91,7 @@ init flags =
       , benevoles = decodedFlags.benevoles
       , selectedTeams = Set.fromList decodedFlags.selectedTeams
       , selectedMissions = Set.fromList decodedFlags.selectedMissions
+      , selectedPatineurTeam = decodedFlags.selectedPatineurTeam
       , contexte = initialContext
       , currentTime = Time.millisToPosix 0
       , zone = Time.utc
@@ -100,7 +106,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectEquipe name ->
-            ( { model | contexte = Just (PourPatineur name) }, Cmd.none )
+            ( { model | selectedPatineurTeam = name }, savePatineurTeam name )
 
         ToggleEquipeCoach name ->
             let
@@ -219,7 +225,7 @@ viewRoleSelection =
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
             [ roleButton "Mon Planning" MonPlanning "📅" "Planning personnel regroupant vos choix"
             , roleButton "Bénévole" PourBenevole "🙋" "Sélectionnez vos missions"
-            , roleButton "Patineur" (PourPatineur "") "⛸️" "Horaires personnels (Nom d'équipe)"
+            , roleButton "Patineur" PourPatineur "⛸️" "Horaires personnels (Nom d'équipe)"
             , roleButton "Coach / Parent / Supporter" PourCoach "📋" "Suivez une ou plusieurs équipes"
             , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Horaires par numéro de vestiaire"
             , roleButton "Buvette" PourBuvette "☕" "Alerte rushs pour la restauration"
@@ -250,7 +256,7 @@ viewStandardLayout model ctx =
                 PourVestiaire _ ->
                     "context-vestiaire"
 
-                PourPatineur _ ->
+                PourPatineur ->
                     "context-patineur"
 
                 PourCoach ->
@@ -318,13 +324,14 @@ viewSelection model ctx =
             getVestiaires model.planning
     in
     case ctx of
-        PourPatineur _ ->
+        PourPatineur ->
             div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
                 [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-3" ] [ text "Équipe" ]
                 , div [ class "relative" ]
                     [ select
                         [ class "block w-full text-lg font-bold p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#ea3a60] appearance-none cursor-pointer text-[#1d1d1d]"
                         , onChange SelectEquipe
+                        , value model.selectedPatineurTeam
                         ]
                         (option [ value "" ] [ text "-- Choisissez votre équipe --" ]
                             :: List.map (\eq -> option [ value eq ] [ text eq ]) equipes
@@ -529,12 +536,13 @@ viewPlanning model ctx =
                 |> List.filter (\c -> estEncorePertinent c nowMinutes)
     in
     case ctx of
-        PourPatineur "" ->
-            [ div [ class "text-center py-10 text-gray-500" ] [ text "Veuillez sélectionner une équipe." ] ]
+        PourPatineur ->
+            if model.selectedPatineurTeam == "" then
+                [ div [ class "text-center py-10 text-gray-500" ] [ text "Veuillez sélectionner une équipe." ] ]
 
-        PourPatineur teamName ->
-            getHorairesPatineur teamName relevantPlanning
-                |> List.map (viewCreneauWithTime nowMinutes)
+            else
+                getHorairesPatineur model.selectedPatineurTeam relevantPlanning
+                    |> List.map (viewCreneauWithTime nowMinutes)
 
         PourCoach ->
             if Set.isEmpty model.selectedTeams then
@@ -570,8 +578,15 @@ viewPlanning model ctx =
                     Benevoles.getMissionsSelectionnees model.selectedMissions missions
                         |> List.filter (Benevoles.estMissionPertinente nowMinutes)
 
+                allTeams =
+                    if model.selectedPatineurTeam == "" then
+                        model.selectedTeams
+
+                    else
+                        Set.insert model.selectedPatineurTeam model.selectedTeams
+
                 coachHoraires =
-                    getHorairesCoach model.selectedTeams relevantPlanning
+                    getHorairesCoach allTeams relevantPlanning
 
                 -- Convert missions to ViewCreneau to sort them together?
                 -- Or just show them in two groups? Sorting together is better.
