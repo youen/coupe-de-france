@@ -30,9 +30,13 @@ type Msg
 port print : () -> Cmd msg
 
 
+port saveBenevoleSelection : List String -> Cmd msg
+
+
 type alias FlagsData =
     { planning : List Creneau
     , benevoles : Maybe Benevoles.Root
+    , selectedMissions : List String
     }
 
 
@@ -41,6 +45,7 @@ flagsDecoder =
     Decode.succeed FlagsData
         |> andMap (Decode.field "planningData" rootDecoder)
         |> andMap (Decode.maybe (Decode.field "benevolesData" Benevoles.rootDecoder))
+        |> andMap (Decode.oneOf [ Decode.field "selectedMissions" (Decode.list Decode.string), Decode.succeed [] ])
 
 
 init : Decode.Value -> ( Model, Cmd Msg )
@@ -48,9 +53,23 @@ init flags =
     let
         decodedFlags =
             Decode.decodeValue flagsDecoder flags
-                |> Result.withDefault { planning = [], benevoles = Nothing }
+                |> Result.withDefault { planning = [], benevoles = Nothing, selectedMissions = [] }
+
+        initialContext =
+            if List.isEmpty decodedFlags.selectedMissions then
+                Nothing
+
+            else
+                Just (PourBenevole (Set.fromList decodedFlags.selectedMissions))
     in
-    ( { planning = decodedFlags.planning, benevoles = decodedFlags.benevoles, contexte = Nothing, currentTime = Time.millisToPosix 0, zone = Time.utc, isDemoMode = False, demoTimeMinutes = 420 }
+    ( { planning = decodedFlags.planning
+      , benevoles = decodedFlags.benevoles
+      , contexte = initialContext
+      , currentTime = Time.millisToPosix 0
+      , zone = Time.utc
+      , isDemoMode = False
+      , demoTimeMinutes = 420
+      }
     , Task.perform AdjustTimeZone Time.here
     )
 
@@ -88,10 +107,14 @@ update msg model =
                             else
                                 Set.insert name set
                     in
-                    ( { model | contexte = Just (PourBenevole newSet) }, Cmd.none )
+                    ( { model | contexte = Just (PourBenevole newSet) }, saveBenevoleSelection (Set.toList newSet) )
 
                 _ ->
-                    ( { model | contexte = Just (PourBenevole (Set.singleton name)) }, Cmd.none )
+                    let
+                        newSet =
+                            Set.singleton name
+                    in
+                    ( { model | contexte = Just (PourBenevole newSet) }, saveBenevoleSelection (Set.toList newSet) )
 
         SelectVestiaire vNum ->
             ( { model | contexte = Just (PourVestiaire vNum) }, Cmd.none )

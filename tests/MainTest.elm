@@ -13,32 +13,33 @@ import Time
 suite : Test
 suite =
     describe "Main module"
-        [ describe "update"
-            [ test "Init should decode flags with planning and benevoles" <|
-                \_ ->
-                    let
-                        flagsJson =
-                            """
-                            {
-                                "planningData": {
-                                    "planning": []
-                                },
-                                "benevolesData": {
-                                    "edition": "Test",
-                                    "postes_benevoles": []
-                                }
-                            }
-                            """
+        [ test "Init should decode flags with planning, benevoles and selectedMissions" <|
+            \_ ->
+                let
+                    flagsJson =
+                        """
+                        {
+                            "planningData": {
+                                "planning": []
+                            },
+                            "benevolesData": {
+                                "edition": "Test",
+                                "postes_benevoles": []
+                            },
+                            "selectedMissions": ["MISSION 1"]
+                        }
+                        """
 
-                        flagsValue =
-                            Decode.decodeString Decode.value flagsJson
-                                |> Result.withDefault (Encode.object [])
+                    flagsValue =
+                        Decode.decodeString Decode.value flagsJson
+                            |> Result.withDefault (Encode.object [])
 
-                        ( newModel, _ ) =
-                            Main.init flagsValue
-                    in
-                    Expect.equal (List.length newModel.planning) 0
-            , test "Print message should returned in a command (non-testable directly easily, but we can check state transitions)" <|
+                    ( newModel, _ ) =
+                        Main.init flagsValue
+                in
+                Expect.equal newModel.contexte (Just (PourBenevole (Set.singleton "MISSION 1")))
+        , describe "update"
+            [ test "Print message should returned in a command (non-testable directly easily, but we can check state transitions)" <|
                 \_ ->
                     let
                         initialModel =
