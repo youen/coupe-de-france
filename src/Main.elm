@@ -417,12 +417,12 @@ viewSelection model ctx =
                                 , text " en cochant les cases."
                                 ]
                             ]
-                        , div [ class "flex items-start gap-4 p-3 bg-white/50 rounded-2xl border border-white cursor-pointer hover:border-[#ea3a60]/30 transition-all", onClick (SetContexte MonPlanning) ]
-                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "2" ]
+                        , div [ class "flex items-start gap-4 cursor-pointer group", onClick (SetContexte MonPlanning) ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5 group-hover:scale-110 transition-transform" ] [ text "2" ]
                             , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
                                 [ text "Consultez vos horaires récapitulés dans "
-                                , span [ class "font-black text-[#ea3a60] underline underline-offset-4 decoration-2" ] [ text "Mon Planning" ]
-                                , text " (cliquez ici)."
+                                , span [ class "font-black text-[#ea3a60] underline underline-offset-4 decoration-2 group-hover:text-[#ea3a60]/80" ] [ text "Mon Planning" ]
+                                , text "."
                                 ]
                             ]
                         , div [ class "flex items-start gap-4" ]
