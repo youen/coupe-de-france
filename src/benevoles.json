@@ -1,0 +1,295 @@
+{
+    "edition": "Coupe de France Nantes 2026",
+    "postes_benevoles": [
+        {
+            "mission": "PREPA POCHETTES EQUIPES",
+            "periode": "AMONT",
+            "jour": null,
+            "description": "Préparation des documents et badges pour les équipes",
+            "lieu": "A définir",
+            "debut": null,
+            "fin": null,
+            "icone": "📂"
+        },
+        {
+            "mission": "PREPA POP CORN",
+            "periode": "AMONT",
+            "jour": null,
+            "description": "Préparation des stocks pour la buvette",
+            "lieu": "A définir",
+            "debut": null,
+            "fin": null,
+            "icone": "🍿"
+        },
+        {
+            "mission": "PREPA PANIERS REPAS",
+            "periode": "AMONT",
+            "jour": null,
+            "description": "Assemblage des repas bénévoles/officiels",
+            "lieu": "A définir",
+            "debut": null,
+            "fin": null,
+            "icone": "🥪"
+        },
+        {
+            "mission": "EXTRA PRACTICE (REZE)",
+            "periode": "VENDREDI",
+            "jour": "2026-04-03",
+            "description": "Accueillir les équipes, guider vers les vestiaires, répondre aux attentes",
+            "lieu": "Patinoire de REZE",
+            "debut": "15:00",
+            "fin": "21:00",
+            "icone": "📍"
+        },
+        {
+            "mission": "EXTRA PRACTICE (PETIT PORT)",
+            "periode": "VENDREDI",
+            "jour": "2026-04-03",
+            "description": "Accueillir les équipes, guider vers les vestiaires, répondre aux attentes",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "15:00",
+            "fin": "21:00",
+            "icone": "📍"
+        },
+        {
+            "mission": "ACCREDITATION (VENDREDI)",
+            "periode": "VENDREDI",
+            "jour": "2026-04-03",
+            "description": "Distribuer les pochettes équipes",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "15:00",
+            "fin": "21:00",
+            "icone": "🆔"
+        },
+        {
+            "mission": "AFFICHAGE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Planning journée sur vestiaire",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "07:00",
+            "icone": "📋"
+        },
+        {
+            "mission": "PREPA VESTIAIRE PUBLIC",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Opacifier, mettre les paravents",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "07:00",
+            "icone": "🧹"
+        },
+        {
+            "mission": "PREPA KISS AND CRY",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Mettre en place la zone Kiss & Cry",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "07:00",
+            "icone": "📸"
+        },
+        {
+            "mission": "PHOTO",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Prise de vue compétition et podiums",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "📷"
+        },
+        {
+            "mission": "ACCREDITATION (SAMEDI)",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Distribuer les pochettes équipes",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "11:00",
+            "icone": "🆔"
+        },
+        {
+            "mission": "BILLETERIE / CAISSE CENTRALE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Suivre la vente de billet en direct / vendre les jetons",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "18:00",
+            "icone": "🎟️"
+        },
+        {
+            "mission": "CONTRÔLE DES BILLETS",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Distribuer les bracelets / contrôler l'accès",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "🎫"
+        },
+        {
+            "mission": "SECURITE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Tourner dans les tribunes, vérifier la libération des escaliers et accès pompiers",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "14:00",
+            "fin": "18:00",
+            "icone": "🛡️"
+        },
+        {
+            "mission": "ACCUEIL JUGES / OFFICIELS",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Accompagner la journée des officiels et juges, salle CRISTAL",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "18:00",
+            "icone": "⚖️"
+        },
+        {
+            "mission": "SALLE DES JUGES",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Accompagner la journée des officiels et juges, salle CRISTAL",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "06:00",
+            "fin": "18:00",
+            "icone": "☕"
+        },
+        {
+            "mission": "ACCUEIL VIP",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Accompagner la journée des VIP même accès que les juges",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "14:00",
+            "fin": "18:00",
+            "icone": "🌟"
+        },
+        {
+            "mission": "MICRO",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Annoncer les équipes, annoncer les scores",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "🎙️"
+        },
+        {
+            "mission": "SECRETAIRE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Soutien administratif compétition",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "✍️"
+        },
+        {
+            "mission": "CAMERAMAN",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Etre formé, filmer la compétition",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "🎥"
+        },
+        {
+            "mission": "BORD DE PISTE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Caisses vêtements et protège lame, gérer entrée, gérer sortie",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "⛸️"
+        },
+        {
+            "mission": "CEREMONIE DE CLOTURE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Organiser l'ensemble de la cérémonie",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "16:00",
+            "fin": "19:00",
+            "icone": "🏆"
+        },
+        {
+            "mission": "VESTIAIRES",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Surveiller les accès et respect des horaires",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "18:00",
+            "icone": "🚪"
+        },
+        {
+            "mission": "SALLE RESTAURATION",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Accompagner le traiteur",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "10:00",
+            "fin": "14:00",
+            "icone": "🍽️"
+        },
+        {
+            "mission": "BAR / BUVETTE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Service et vente",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "07:00",
+            "fin": "20:00",
+            "icone": "🥤"
+        },
+        {
+            "mission": "BOUTIQUE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Organiser, suivre les ventes, suivre les stocks, lien merveille de glace",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "10:00",
+            "fin": "18:00",
+            "icone": "👕"
+        },
+        {
+            "mission": "NETTOYAGE",
+            "periode": "SAMEDI",
+            "jour": "2026-04-04",
+            "description": "Nettoyage fin de journée",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "18:00",
+            "fin": "19:00",
+            "icone": "🧹"
+        },
+        {
+            "mission": "REGROUPEMENT JUVENILE / PREJUVENILE",
+            "periode": "DIMANCHE",
+            "jour": "2026-04-05",
+            "description": "Encadrement du regroupement",
+            "lieu": "Patinoire du Petit Port",
+            "debut": "08:00",
+            "fin": "13:00",
+            "icone": "👥"
+        },
+        {
+            "mission": "ACCUEIL SALLE DES JUGES (DIMANCHE)",
+            "periode": "DIMANCHE",
+            "jour": "2026-04-05",
+            "description": "Accueil et service salle des juges",
+            "lieu": "Patinoire de REZE",
+            "debut": "08:00",
+            "fin": "13:00",
+            "icone": "⚖️"
+        }
+    ]
+}
