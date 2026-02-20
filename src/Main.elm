@@ -553,9 +553,24 @@ viewPlanning model ctx =
         nowMinutes =
             getEffectiveMinutes model realMinutes
 
+        isCompetitionDay =
+            Time.toYear model.zone model.currentTime
+                == 2026
+                && Time.toMonth model.zone model.currentTime
+                == Time.Apr
+                && Time.toDay model.zone model.currentTime
+                == 4
+
+        shouldMask =
+            model.isDemoMode || isCompetitionDay
+
         relevantPlanning =
-            model.planning
-                |> List.filter (\c -> estEncorePertinent c nowMinutes)
+            if shouldMask then
+                model.planning
+                    |> List.filter (\c -> estEncorePertinent c nowMinutes)
+
+            else
+                model.planning
     in
     case ctx of
         PourPatineur ->
@@ -598,7 +613,12 @@ viewPlanning model ctx =
 
                 selectedMissions =
                     Benevoles.getMissionsSelectionnees model.selectedMissions missions
-                        |> List.filter (Benevoles.estMissionPertinente nowMinutes)
+                        |> (if shouldMask then
+                                List.filter (Benevoles.estMissionPertinente nowMinutes)
+
+                            else
+                                identity
+                           )
 
                 allTeams =
                     if model.selectedPatineurTeam == "" then
