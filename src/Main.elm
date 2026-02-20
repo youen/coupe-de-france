@@ -433,6 +433,14 @@ viewSelection model ctx =
                                 , text " via le bouton email dans l'onglet Mon Planning."
                                 ]
                             ]
+                        , div [ class "flex items-start gap-4" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "4" ]
+                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                                [ text "N'oubliez pas d'"
+                                , span [ class "font-black text-slate-800" ] [ text "ajouter les horaires" ]
+                                , text " dans votre agenda personnel."
+                                ]
+                            ]
                         ]
                     ]
                     :: List.map
