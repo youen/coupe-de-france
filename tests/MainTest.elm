@@ -37,7 +37,7 @@ suite =
                     ( newModel, _ ) =
                         Main.init flagsValue
                 in
-                Expect.equal newModel.contexte (Just PourBenevole)
+                Expect.equal newModel.contexte (Just MonPlanning)
         , describe "update"
             [ test "Print message should returned in a command (non-testable directly easily, but we can check state transitions)" <|
                 \_ ->

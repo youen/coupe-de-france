@@ -75,7 +75,7 @@ init flags =
                 Nothing
 
             else
-                Just PourBenevole
+                Just MonPlanning
     in
     ( { planning = decodedFlags.planning
       , benevoles = decodedFlags.benevoles
