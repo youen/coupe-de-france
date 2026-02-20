@@ -879,19 +879,11 @@ viewBuvetteCreneau shouldMask nowMinutes creneau =
 viewBenevoleMissionItem : Bool -> Int -> Benevoles.Mission -> Html Msg
 viewBenevoleMissionItem shouldMask nowMinutes mission =
     let
-        timeRangeStr =
-            case ( mission.debut, mission.fin ) of
-                ( Just s, Just e ) ->
-                    s ++ " - " ++ e
+        timeDebut =
+            mission.debut |> Maybe.withDefault "--:--"
 
-                ( Just s, Nothing ) ->
-                    s
-
-                ( Nothing, Just e ) ->
-                    "?? - " ++ e
-
-                _ ->
-                    "--:--"
+        timeFin =
+            mission.fin |> Maybe.withDefault ""
 
         timeMinutes =
             case mission.debut of
@@ -947,10 +939,11 @@ viewBenevoleMissionItem shouldMask nowMinutes mission =
             else
                 span [ class "px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md" ] [ text "📍 PETIT PORT" ]
     in
-    div [ class ("group flex items-center gap-6 p-5 border border-slate-100 bg-white rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 " ++ borderL ++ opacityClass) ]
-        [ div [ class "flex-shrink-0 w-28 flex flex-col items-center justify-center border-r border-slate-100 pr-6" ]
-            [ div [ class "text-sm font-black text-[#1d1d1d] font-mono tracking-tighter whitespace-nowrap" ] [ text timeRangeStr ]
-            , div [ class "text-2xl mt-1" ] [ text mission.icone ]
+    div [ class ("group flex items-center gap-4 p-4 border border-slate-100 bg-white rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300 " ++ borderL ++ opacityClass) ]
+        [ div [ class "flex-shrink-0 w-16 flex flex-col items-center justify-center border-r border-slate-100 pr-4" ]
+            [ div [ class "text-[10px] font-black text-slate-400 font-mono tracking-tighter" ] [ text timeDebut ]
+            , div [ class "text-2xl my-1" ] [ text mission.icone ]
+            , div [ class "text-[10px] font-black text-slate-400 font-mono tracking-tighter" ] [ text timeFin ]
             ]
         , div [ class "flex-1 overflow-hidden" ]
             [ div [ class "text-lg font-black leading-tight mb-0.5 text-slate-700 uppercase" ] [ text mission.mission ]
