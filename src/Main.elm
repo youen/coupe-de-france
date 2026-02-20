@@ -515,7 +515,7 @@ viewMissionCheckbox mission isChecked =
                   else
                     span [ class "px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-black rounded uppercase" ] [ text ("🕒 " ++ timeRange) ]
                 ]
-            , div [ class "text-[10px] font-medium text-slate-400 line-clamp-1" ] [ text mission.description ]
+            , div [ class "text-[10px] font-medium text-slate-400" ] [ text mission.description ]
             ]
         ]
 
@@ -947,7 +947,7 @@ viewBenevoleMissionItem shouldMask nowMinutes mission =
             ]
         , div [ class "flex-1 overflow-hidden" ]
             [ div [ class "text-lg font-black leading-tight mb-0.5 text-slate-700 uppercase" ] [ text mission.mission ]
-            , div [ class "text-sm font-medium text-slate-500 mb-2 line-clamp-2" ] [ text mission.description ]
+            , div [ class "text-sm font-medium text-slate-500 mb-2" ] [ text mission.description ]
             , div [ class "flex items-center gap-3" ]
                 [ locationBadge
                 , div [ class "text-[10px] font-bold text-slate-300 uppercase tracking-widest" ] [ text mission.periode ]
