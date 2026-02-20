@@ -1,5 +1,6 @@
 module Model exposing (..)
 
+import Benevoles
 import Json.Decode as Decode exposing (Decoder)
 import Set
 import Time
@@ -74,6 +75,7 @@ type UserContext
 
 type alias Model =
     { planning : List Creneau
+    , benevoles : Maybe Benevoles.Root
     , contexte : Maybe UserContext
     , currentTime : Time.Posix
     , zone : Time.Zone

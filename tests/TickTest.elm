@@ -15,6 +15,7 @@ suite =
                 let
                     initialModel =
                         { planning = []
+                        , benevoles = Nothing
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0
                         , zone = Time.utc

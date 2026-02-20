@@ -1,6 +1,8 @@
 module MainTest exposing (..)
 
 import Expect
+import Json.Decode as Decode
+import Json.Encode as Encode
 import Main
 import Model exposing (UserContext(..))
 import Test exposing (..)
@@ -11,11 +13,36 @@ suite : Test
 suite =
     describe "Main module"
         [ describe "update"
-            [ test "Print message should returned in a command (non-testable directly easily, but we can check state transitions)" <|
+            [ test "Init should decode flags with planning and benevoles" <|
+                \_ ->
+                    let
+                        flagsJson =
+                            """
+                            {
+                                "planningData": {
+                                    "planning": []
+                                },
+                                "benevolesData": {
+                                    "edition": "Test",
+                                    "postes_benevoles": []
+                                }
+                            }
+                            """
+
+                        flagsValue =
+                            Decode.decodeString Decode.value flagsJson
+                                |> Result.withDefault (Encode.object [])
+
+                        ( newModel, _ ) =
+                            Main.init flagsValue
+                    in
+                    Expect.equal (List.length newModel.planning) 0
+            , test "Print message should returned in a command (non-testable directly easily, but we can check state transitions)" <|
                 \_ ->
                     let
                         initialModel =
                             { planning = []
+                            , benevoles = Nothing
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -33,6 +60,7 @@ suite =
                     let
                         initialModel =
                             { planning = []
+                            , benevoles = Nothing
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -49,6 +77,7 @@ suite =
                     let
                         initialModel =
                             { planning = []
+                            , benevoles = Nothing
                             , contexte = Just (PourVestiaire 1)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
@@ -65,6 +94,7 @@ suite =
                     let
                         initialModel =
                             { planning = []
+                            , benevoles = Nothing
                             , contexte = Just (PourVestiaire 0)
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc

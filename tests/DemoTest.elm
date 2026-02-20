@@ -19,6 +19,7 @@ suite =
                     -- 12:00
                     model =
                         { planning = []
+                        , benevoles = Nothing
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0 -- irrelevant here
                         , zone = Time.utc
@@ -44,6 +45,7 @@ suite =
                     -- 15:00
                     model =
                         { planning = []
+                        , benevoles = Nothing
                         , contexte = Nothing
                         , currentTime = Time.millisToPosix 0
                         , zone = Time.utc

@@ -1,5 +1,6 @@
-port module Main exposing (Msg(..), main, update)
+port module Main exposing (Msg(..), init, main, update)
 
+import Benevoles
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -28,14 +29,27 @@ type Msg
 port print : () -> Cmd msg
 
 
+type alias FlagsData =
+    { planning : List Creneau
+    , benevoles : Maybe Benevoles.Root
+    }
+
+
+flagsDecoder : Decode.Decoder FlagsData
+flagsDecoder =
+    Decode.succeed FlagsData
+        |> andMap (Decode.field "planningData" rootDecoder)
+        |> andMap (Decode.maybe (Decode.field "benevolesData" Benevoles.rootDecoder))
+
+
 init : Decode.Value -> ( Model, Cmd Msg )
 init flags =
     let
-        decodedPlanning =
-            Decode.decodeValue rootDecoder flags
-                |> Result.withDefault []
+        decodedFlags =
+            Decode.decodeValue flagsDecoder flags
+                |> Result.withDefault { planning = [], benevoles = Nothing }
     in
-    ( { planning = decodedPlanning, contexte = Nothing, currentTime = Time.millisToPosix 0, zone = Time.utc, isDemoMode = False, demoTimeMinutes = 420 }
+    ( { planning = decodedFlags.planning, benevoles = decodedFlags.benevoles, contexte = Nothing, currentTime = Time.millisToPosix 0, zone = Time.utc, isDemoMode = False, demoTimeMinutes = 420 }
     , Task.perform AdjustTimeZone Time.here
     )
 
