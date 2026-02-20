@@ -83,4 +83,22 @@ suite =
                     Decode.decodeString rootDecoder json
                         |> Expect.equal (Ok expected)
             ]
+        , describe "getPeriodes"
+            [ test "should extract unique periods in correct order from list of missions" <|
+                \_ ->
+                    let
+                        missions =
+                            [ { mission = "M1", periode = "DIMANCHE", jour = Nothing, description = "", lieu = "", debut = Nothing, fin = Nothing, icone = "" }
+                            , { mission = "M2", periode = "AMONT", jour = Nothing, description = "", lieu = "", debut = Nothing, fin = Nothing, icone = "" }
+                            , { mission = "M3", periode = "SAMEDI", jour = Nothing, description = "", lieu = "", debut = Nothing, fin = Nothing, icone = "" }
+                            , { mission = "M4", periode = "VENDREDI", jour = Nothing, description = "", lieu = "", debut = Nothing, fin = Nothing, icone = "" }
+                            , { mission = "M5", periode = "AMONT", jour = Nothing, description = "", lieu = "", debut = Nothing, fin = Nothing, icone = "" }
+                            ]
+
+                        expected =
+                            [ "AMONT", "VENDREDI", "SAMEDI", "DIMANCHE" ]
+                    in
+                    getPeriodes missions
+                        |> Expect.equal expected
+            ]
         ]
