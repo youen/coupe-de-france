@@ -300,13 +300,105 @@ viewSelection model ctx =
         PourBuvette ->
             text ""
 
-        PourBenevole _ ->
-            div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
-                [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Missions sélectionnées..." ]
+        PourBenevole set ->
+            let
+                missions =
+                    model.benevoles
+                        |> Maybe.map .postesBenevoles
+                        |> Maybe.withDefault []
 
-                -- For now just a placeholder for selection, we will need to list missions
-                , text " (WIP Sélection missions) "
+                periodes =
+                    Benevoles.getPeriodes missions
+            in
+            div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
+                [ h2 [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Sélectionnez vos missions" ]
+                , div [ class "space-y-6" ]
+                    (List.map
+                        (\periode ->
+                            let
+                                periodeMissions =
+                                    missions
+                                        |> List.filter (\m -> m.periode == periode)
+                            in
+                            div [ class "space-y-3" ]
+                                [ div [ class "flex items-center gap-3" ]
+                                    [ h3 [ class "text-sm font-black text-slate-800 uppercase tracking-wider" ] [ text periode ]
+                                    , div [ class "h-px bg-slate-100 flex-1" ] []
+                                    ]
+                                , div [ class "grid grid-cols-1 md:grid-cols-2 gap-3" ]
+                                    (List.map (\m -> viewMissionCheckbox m (Set.member m.mission set)) periodeMissions)
+                                ]
+                        )
+                        periodes
+                    )
                 ]
+
+
+viewMissionCheckbox : Benevoles.Mission -> Bool -> Html Msg
+viewMissionCheckbox mission isChecked =
+    let
+        activeClasses =
+            if isChecked then
+                "border-[#ea3a60] bg-[#ea3a60]/5 shadow-sm"
+
+            else
+                "border-slate-100 bg-white hover:border-slate-300"
+
+        iconClasses =
+            if isChecked then
+                "bg-[#ea3a60] text-white"
+
+            else
+                "bg-slate-50 text-slate-400 group-hover:bg-slate-100"
+    in
+    label
+        [ class ("group relative flex items-start gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 " ++ activeClasses)
+        ]
+        [ input
+            [ type_ "checkbox"
+            , checked isChecked
+            , onCheck (\_ -> ToggleMissionBenevole mission.mission)
+            , class "peer sr-only"
+            ]
+            []
+        , div
+            [ class ("flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-colors " ++ iconClasses) ]
+            [ text mission.icone ]
+        , div [ class "flex-1 min-w-0" ]
+            [ div [ class "flex items-center justify-between gap-2 mb-1" ]
+                [ div
+                    [ class
+                        ("font-black text-sm truncate "
+                            ++ (if isChecked then
+                                    "text-[#ea3a60]"
+
+                                else
+                                    "text-slate-700"
+                               )
+                        )
+                    ]
+                    [ text mission.mission ]
+                , div
+                    [ class
+                        ("w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors flex-shrink-0 "
+                            ++ (if isChecked then
+                                    "border-[#ea3a60] bg-[#ea3a60]"
+
+                                else
+                                    "border-slate-200 bg-white"
+                               )
+                        )
+                    ]
+                    [ if isChecked then
+                        span [ class "text-white text-xs" ] [ text "✓" ]
+
+                      else
+                        text ""
+                    ]
+                ]
+            , div [ class "text-xs font-medium text-slate-500 truncate" ] [ text mission.lieu ]
+            ]
+        ]
 
 
 viewCheckbox : String -> Bool -> Html Msg
