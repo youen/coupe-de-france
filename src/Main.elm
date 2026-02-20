@@ -403,23 +403,55 @@ viewSelection model ctx =
                     Benevoles.getPeriodes missions
             in
             div [ class "flex flex-col gap-8" ]
-                (List.map
-                    (\periode ->
-                        let
-                            periodeMissions =
-                                missions
-                                    |> List.filter (\m -> m.periode == periode)
-                        in
-                        div [ class "bg-slate-50/50 p-6 rounded-[2.5rem] border border-slate-100" ]
-                            [ div [ class "flex items-center gap-3 mb-6 px-2" ]
-                                [ span [ class "text-sm font-black text-slate-400 uppercase tracking-widest" ] [ text periode ]
-                                , div [ class "h-px flex-1 bg-slate-200/50" ] []
+                (div [ class "bg-[#ea3a60]/5 rounded-[2.5rem] p-6 border border-[#ea3a60]/10 mb-2" ]
+                    [ div [ class "flex items-center gap-3 mb-4" ]
+                        [ span [ class "text-xl" ] [ text "👋" ]
+                        , h2 [ class "text-sm font-black text-[#ea3a60] uppercase tracking-wider" ] [ text "Comment ça marche ?" ]
+                        ]
+                    , div [ class "grid grid-cols-1 gap-4" ]
+                        [ div [ class "flex items-start gap-4" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "1" ]
+                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                                [ text "Parcourez la liste et "
+                                , span [ class "font-black text-slate-800" ] [ text "choisissez vos missions" ]
+                                , text " en cochant les cases."
                                 ]
-                            , div [ class "grid grid-cols-1 md:grid-cols-2 gap-3" ]
-                                (List.map (\m -> viewMissionCheckbox m (Set.member m.mission set)) periodeMissions)
                             ]
-                    )
-                    periodes
+                        , div [ class "flex items-start gap-4 p-3 bg-white/50 rounded-2xl border border-white cursor-pointer hover:border-[#ea3a60]/30 transition-all", onClick (SetContexte MonPlanning) ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "2" ]
+                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                                [ text "Consultez vos horaires récapitulés dans "
+                                , span [ class "font-black text-[#ea3a60] underline underline-offset-4 decoration-2" ] [ text "Mon Planning" ]
+                                , text " (cliquez ici)."
+                                ]
+                            ]
+                        , div [ class "flex items-start gap-4" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "3" ]
+                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                                [ text "Une fois votre sélection finie, "
+                                , span [ class "font-black text-slate-800" ] [ text "confirmez votre choix" ]
+                                , text " via le bouton email dans l'onglet Mon Planning."
+                                ]
+                            ]
+                        ]
+                    ]
+                    :: List.map
+                        (\periode ->
+                            let
+                                periodeMissions =
+                                    missions
+                                        |> List.filter (\m -> m.periode == periode)
+                            in
+                            div [ class "bg-slate-50/50 p-6 rounded-[2.5rem] border border-slate-100" ]
+                                [ div [ class "flex items-center gap-3 mb-6 px-2" ]
+                                    [ span [ class "text-sm font-black text-slate-400 uppercase tracking-widest" ] [ text periode ]
+                                    , div [ class "h-px flex-1 bg-slate-200/50" ] []
+                                    ]
+                                , div [ class "grid grid-cols-1 md:grid-cols-2 gap-3" ]
+                                    (List.map (\m -> viewMissionCheckbox m (Set.member m.mission set)) periodeMissions)
+                                ]
+                        )
+                        periodes
                 )
 
         MonPlanning ->
@@ -602,7 +634,7 @@ viewPlanning model ctx =
                     |> List.concatMap viewVestiaireCategorie
 
         PourBenevole ->
-            [ div [ class "text-center py-10 text-gray-500" ] [ text "Sélectionnez vos missions dans l'onglet 'Bénévole' (en bas)." ] ]
+            []
 
         MonPlanning ->
             let
