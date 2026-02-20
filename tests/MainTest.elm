@@ -5,6 +5,7 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Main
 import Model exposing (UserContext(..))
+import Set
 import Test exposing (..)
 import Time
 
@@ -106,5 +107,39 @@ suite =
                             Main.update Main.GoBack initialModel
                     in
                     Expect.equal newModel.contexte Nothing
+            , test "US1: ToggleMissionBenevole adds a mission to the set when not present" <|
+                \_ ->
+                    let
+                        initialModel =
+                            { planning = []
+                            , benevoles = Nothing
+                            , contexte = Just (PourBenevole Set.empty)
+                            , currentTime = Time.millisToPosix 0
+                            , zone = Time.utc
+                            , isDemoMode = False
+                            , demoTimeMinutes = 420
+                            }
+
+                        ( newModel, _ ) =
+                            Main.update (Main.ToggleMissionBenevole "PREPA POCHETTES") initialModel
+                    in
+                    Expect.equal newModel.contexte (Just (PourBenevole (Set.singleton "PREPA POCHETTES")))
+            , test "US1: ToggleMissionBenevole removes a mission from the set when present" <|
+                \_ ->
+                    let
+                        initialModel =
+                            { planning = []
+                            , benevoles = Nothing
+                            , contexte = Just (PourBenevole (Set.singleton "PREPA POCHETTES"))
+                            , currentTime = Time.millisToPosix 0
+                            , zone = Time.utc
+                            , isDemoMode = False
+                            , demoTimeMinutes = 420
+                            }
+
+                        ( newModel, _ ) =
+                            Main.update (Main.ToggleMissionBenevole "PREPA POCHETTES") initialModel
+                    in
+                    Expect.equal newModel.contexte (Just (PourBenevole Set.empty))
             ]
         ]

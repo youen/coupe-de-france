@@ -15,6 +15,7 @@ import Time
 type Msg
     = SelectEquipe String
     | ToggleEquipeCoach String
+    | ToggleMissionBenevole String
     | SelectVestiaire Int
     | Print
     | SetContexte UserContext
@@ -75,6 +76,22 @@ update msg model =
 
                 _ ->
                     ( { model | contexte = Just (PourCoach (Set.singleton name)) }, Cmd.none )
+
+        ToggleMissionBenevole name ->
+            case model.contexte of
+                Just (PourBenevole set) ->
+                    let
+                        newSet =
+                            if Set.member name set then
+                                Set.remove name set
+
+                            else
+                                Set.insert name set
+                    in
+                    ( { model | contexte = Just (PourBenevole newSet) }, Cmd.none )
+
+                _ ->
+                    ( { model | contexte = Just (PourBenevole (Set.singleton name)) }, Cmd.none )
 
         SelectVestiaire vNum ->
             ( { model | contexte = Just (PourVestiaire vNum) }, Cmd.none )
@@ -137,7 +154,8 @@ viewRoleSelection =
             , p [ class "text-[#1d1d1d] font-medium opacity-60" ] [ text "Choisissez votre accès au planning" ]
             ]
         , div [ class "z-10 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl" ]
-            [ roleButton "Patineur" (PourPatineur "") "⛸️" "Consultez vos horaires personnels"
+            [ roleButton "Bénévole" (PourBenevole Set.empty) "🙋" "Consultez vos missions et horaires"
+            , roleButton "Patineur" (PourPatineur "") "⛸️" "Consultez vos horaires personnels"
             , roleButton "Coach" (PourCoach Set.empty) "📋" "Gérez plusieurs équipes simultanément"
             , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Impression pour les portes des vestiaires"
             , roleButton "Buvette" PourBuvette "☕" "Anticipez les rushs de surfaçage"
@@ -173,6 +191,9 @@ viewStandardLayout model ctx =
 
                 PourCoach _ ->
                     "context-coach"
+
+                PourBenevole _ ->
+                    "context-benevole"
 
                 PourBuvette ->
                     "context-buvette"
@@ -279,6 +300,14 @@ viewSelection model ctx =
         PourBuvette ->
             text ""
 
+        PourBenevole _ ->
+            div [ class "mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200" ]
+                [ label [ class "block text-xs font-black text-slate-400 uppercase tracking-widest mb-4" ] [ text "Missions sélectionnées..." ]
+
+                -- For now just a placeholder for selection, we will need to list missions
+                , text " (WIP Sélection missions) "
+                ]
+
 
 viewCheckbox : String -> Bool -> Html Msg
 viewCheckbox name isChecked =
@@ -344,6 +373,9 @@ viewPlanning model ctx =
             else
                 getHorairesVestiaireGrouped vNum model.planning
                     |> List.concatMap viewVestiaireCategorie
+
+        PourBenevole _ ->
+            [ div [ class "text-center py-10" ] [ text "WIP Liste missions bénévole" ] ]
 
 
 viewDemoMode : Model -> Html Msg
