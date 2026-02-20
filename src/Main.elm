@@ -25,12 +25,27 @@ type Msg
     | SetDemoMode Bool
     | SetDemoTime Int
     | GoBack
+    | ExportMission Benevoles.Mission
+    | ExportAllMissions
 
 
 port print : () -> Cmd msg
 
 
 port saveBenevoleSelection : List String -> Cmd msg
+
+
+port exportCalendar : List CalendarEvent -> Cmd msg
+
+
+type alias CalendarEvent =
+    { title : String
+    , day : Maybe String -- YYYY-MM-DD
+    , startTime : Maybe String -- HH:mm
+    , endTime : Maybe String -- HH:mm
+    , description : String
+    , location : String
+    }
 
 
 type alias FlagsData =
@@ -141,20 +156,57 @@ update msg model =
             ( { model | demoTimeMinutes = minutes }, Cmd.none )
 
         GoBack ->
-            let
-                newCtx =
-                    case model.contexte of
-                        Just (PourVestiaire n) ->
-                            if n > 0 then
-                                Just (PourVestiaire 0)
+            case model.contexte of
+                Just (PourVestiaire vNum) ->
+                    if vNum == 0 then
+                        ( { model | contexte = Nothing }, Cmd.none )
 
-                            else
-                                Nothing
+                    else
+                        ( { model | contexte = Just (PourVestiaire 0) }, Cmd.none )
 
-                        _ ->
-                            Nothing
-            in
-            ( { model | contexte = newCtx }, Cmd.none )
+                _ ->
+                    ( { model | contexte = Nothing }, Cmd.none )
+
+        ExportMission mission ->
+            ( model
+            , exportCalendar
+                [ { title = mission.mission
+                  , day = mission.jour
+                  , startTime = mission.debut
+                  , endTime = mission.fin
+                  , description = mission.description
+                  , location = mission.lieu
+                  }
+                ]
+            )
+
+        ExportAllMissions ->
+            case model.contexte of
+                Just (PourBenevole set) ->
+                    let
+                        missions =
+                            model.benevoles
+                                |> Maybe.map .postesBenevoles
+                                |> Maybe.withDefault []
+                                |> List.filter (\m -> Set.member m.mission set)
+
+                        events =
+                            missions
+                                |> List.map
+                                    (\m ->
+                                        { title = m.mission
+                                        , day = m.jour
+                                        , startTime = m.debut
+                                        , endTime = m.fin
+                                        , description = m.description
+                                        , location = m.lieu
+                                        }
+                                    )
+                    in
+                    ( model, exportCalendar events )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -502,10 +554,20 @@ viewPlanning model ctx =
                     model.benevoles
                         |> Maybe.map .postesBenevoles
                         |> Maybe.withDefault []
+
+                selectedMissions =
+                    Benevoles.getMissionsSelectionnees set missions
+                        |> List.filter (Benevoles.estMissionPertinente nowMinutes)
             in
-            Benevoles.getMissionsSelectionnees set missions
-                |> List.filter (Benevoles.estMissionPertinente nowMinutes)
-                |> List.map (viewBenevoleMissionItem nowMinutes)
+            if List.isEmpty selectedMissions then
+                [ div [ class "text-center py-10 text-gray-400" ] [ text "Aucune mission sélectionnée ou à venir." ] ]
+
+            else
+                div [ class "flex justify-end mb-6" ]
+                    [ button [ class "flex items-center gap-2 px-6 py-3 bg-black text-white rounded-2xl font-black text-sm hover:bg-[#ea3a60] transition-colors shadow-lg active:scale-95", onClick ExportAllMissions ]
+                        [ text "📅 TOUT EXPORTER" ]
+                    ]
+                    :: List.map (viewBenevoleMissionItem nowMinutes) selectedMissions
 
 
 viewDemoMode : Model -> Html Msg
@@ -784,7 +846,16 @@ viewBenevoleMissionItem nowMinutes mission =
                 , div [ class "text-[10px] font-bold text-slate-300 uppercase tracking-widest" ] [ text mission.periode ]
                 ]
             ]
-        , div [ class "w-2 h-12 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors" ] []
+        , div [ class "flex flex-col items-center gap-2" ]
+            [ button
+                [ class "p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-[#ea3a60] hover:text-white transition-all active:scale-95 group/btn"
+                , onClick (ExportMission mission)
+                , title "Exporter vers mon agenda"
+                ]
+                [ span [ class "text-lg" ] [ text "📅" ]
+                ]
+            , div [ class "w-1 h-8 bg-slate-100 rounded-full group-hover:bg-[#ea3a60]/20 transition-colors" ] []
+            ]
         ]
 
 
