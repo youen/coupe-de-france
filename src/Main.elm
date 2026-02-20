@@ -579,7 +579,7 @@ viewPlanning model ctx =
 
             else
                 getHorairesPatineur model.selectedPatineurTeam relevantPlanning
-                    |> List.map (viewCreneauWithTime nowMinutes)
+                    |> List.map (viewCreneauWithTime shouldMask nowMinutes)
 
         PourCoach ->
             if Set.isEmpty model.selectedTeams then
@@ -587,11 +587,11 @@ viewPlanning model ctx =
 
             else
                 getHorairesCoach model.selectedTeams relevantPlanning
-                    |> List.map (viewCreneauWithTime nowMinutes)
+                    |> List.map (viewCreneauWithTime shouldMask nowMinutes)
 
         PourBuvette ->
             getHorairesBuvette relevantPlanning
-                |> List.map (viewBuvetteCreneau nowMinutes)
+                |> List.map (viewBuvetteCreneau shouldMask nowMinutes)
 
         PourVestiaire vNum ->
             if vNum == 0 then
@@ -653,7 +653,7 @@ viewPlanning model ctx =
                                 [ h2 [ class "text-sm font-black text-slate-800 uppercase tracking-widest" ] [ text "Mes Missions" ]
                                 , button [ class "text-[10px] font-black text-[#ea3a60] uppercase border-b border-[#ea3a60]/20 pb-0.5", onClick ExportAllMissions ] [ text "Tout exporter 📅" ]
                                 ]
-                            , div [ class "space-y-3" ] (List.map (viewBenevoleMissionItem nowMinutes) selectedMissions)
+                            , div [ class "space-y-3" ] (List.map (viewBenevoleMissionItem shouldMask nowMinutes) selectedMissions)
                             ]
                         ]
                     , if List.isEmpty coachHoraires then
@@ -665,7 +665,7 @@ viewPlanning model ctx =
                                 [ h2 [ class "text-sm font-black text-slate-800 uppercase tracking-widest" ] [ text "Mes Équipes" ]
                                 , div [ class "ml-3 h-px flex-1 bg-slate-100" ] []
                                 ]
-                            , div [ class "space-y-3" ] (List.map (viewCreneauWithTime nowMinutes) coachHoraires)
+                            , div [ class "space-y-3" ] (List.map (viewCreneauWithTime shouldMask nowMinutes) coachHoraires)
                             ]
                         ]
                     ]
@@ -704,14 +704,14 @@ viewDemoMode model =
         ]
 
 
-viewCreneauWithTime : Int -> ViewCreneau -> Html Msg
-viewCreneauWithTime nowMinutes creneau =
+viewCreneauWithTime : Bool -> Int -> ViewCreneau -> Html Msg
+viewCreneauWithTime shouldMask nowMinutes creneau =
     let
         timeMinutes =
             viewCreneauToMinutes creneau
 
         isPast =
-            nowMinutes > timeMinutes
+            shouldMask && nowMinutes > timeMinutes
     in
     viewCreneau nowMinutes creneau isPast
 
@@ -839,14 +839,14 @@ viewMilestoneTime time =
     div [ class "w-14 print:w-16 text-center text-sm font-bold print:text-[12px] print:font-black" ] [ text time ]
 
 
-viewBuvetteCreneau : Int -> ViewCreneau -> Html Msg
-viewBuvetteCreneau nowMinutes creneau =
+viewBuvetteCreneau : Bool -> Int -> ViewCreneau -> Html Msg
+viewBuvetteCreneau shouldMask nowMinutes creneau =
     let
         timeMinutes =
             viewCreneauToMinutes creneau
 
         isPast =
-            nowMinutes > (timeMinutes + 15)
+            shouldMask && nowMinutes > (timeMinutes + 15)
 
         opacityClass =
             if isPast then
@@ -875,8 +875,8 @@ viewBuvetteCreneau nowMinutes creneau =
         ]
 
 
-viewBenevoleMissionItem : Int -> Benevoles.Mission -> Html Msg
-viewBenevoleMissionItem nowMinutes mission =
+viewBenevoleMissionItem : Bool -> Int -> Benevoles.Mission -> Html Msg
+viewBenevoleMissionItem shouldMask nowMinutes mission =
     let
         timeRangeStr =
             case ( mission.debut, mission.fin ) of
@@ -906,7 +906,8 @@ viewBenevoleMissionItem nowMinutes mission =
                     0
 
         isPast =
-            mission.periode
+            shouldMask
+                && mission.periode
                 == "SAMEDI"
                 && (case mission.fin of
                         Just t ->
