@@ -485,7 +485,7 @@ viewSelection model ctx =
                                 , onClick GoToRecap
                                 , Html.Attributes.disabled (nbSelected == 0)
                                 ]
-                                [ span [ class "text-xl" ] [ text "�" ]
+                                [ span [ class "text-xl" ] [ text "📋" ]
                                 , text
                                     (if nbSelected > 0 then
                                         "Voir le récapitulatif ("
