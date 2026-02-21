@@ -437,6 +437,14 @@ viewSelection model ctx =
                         , div [ class "flex items-start gap-4" ]
                             [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5" ] [ text "2" ]
                             , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                                [ text "Une fois votre sélection finie, cliquez sur "
+                                , span [ class "font-black text-slate-800" ] [ text "Voir le récapitulatif" ]
+                                , text " pour confirmer par email."
+                                ]
+                            ]
+                        , div [ class "flex items-start gap-4" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5" ] [ text "3" ]
+                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
                                 [ text "N'oubliez pas d'"
                                 , span [ class "font-black text-slate-800" ] [ text "ajouter les horaires" ]
                                 , text " dans votre agenda via l'icône "
@@ -444,12 +452,12 @@ viewSelection model ctx =
                                 , text "."
                                 ]
                             ]
-                        , div [ class "flex items-start gap-4" ]
-                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5" ] [ text "3" ]
+                        , div [ class "flex items-start gap-4 cursor-pointer group", onClick (SetContexte MonPlanning) ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5 group-hover:scale-110 transition-transform" ] [ text "4" ]
                             , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
-                                [ text "Une fois votre sélection finie, cliquez sur "
-                                , span [ class "font-black text-slate-800" ] [ text "Voir le récapitulatif" ]
-                                , text " pour confirmer par email."
+                                [ text "Retrouvez votre sélection dans la partie "
+                                , span [ class "font-black text-[#ea3a60] underline underline-offset-4 decoration-2 group-hover:text-[#ea3a60]/80" ] [ text "Mon Planning" ]
+                                , text "."
                                 ]
                             ]
                         ]
