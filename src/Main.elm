@@ -415,6 +415,9 @@ viewSelection model ctx =
 
                 periodes =
                     Benevoles.getPeriodes missions
+
+                nbSelected =
+                    Set.size set
             in
             div [ class "flex flex-col gap-8" ]
                 (div [ class "bg-[#ea3a60]/5 rounded-[2.5rem] p-6 border border-[#ea3a60]/10 mb-2" ]
@@ -424,37 +427,29 @@ viewSelection model ctx =
                         ]
                     , div [ class "grid grid-cols-1 gap-4" ]
                         [ div [ class "flex items-start gap-4" ]
-                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "1" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5" ] [ text "1" ]
                             , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
                                 [ text "Parcourez la liste et "
-                                , span [ class "font-black text-slate-800" ] [ text "choisissez vos missions" ]
-                                , text " en cochant les cases."
-                                ]
-                            ]
-                        , div [ class "flex items-start gap-4 cursor-pointer group", onClick (SetContexte MonPlanning) ]
-                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5 group-hover:scale-110 transition-transform" ] [ text "2" ]
-                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
-                                [ text "Consultez vos horaires récapitulés dans "
-                                , span [ class "font-black text-[#ea3a60] underline underline-offset-4 decoration-2 group-hover:text-[#ea3a60]/80" ] [ text "Mon Planning" ]
-                                , text "."
+                                , span [ class "font-black text-slate-800" ] [ text "cochez les cases" ]
+                                , text " pour sélectionner vos missions."
                                 ]
                             ]
                         , div [ class "flex items-start gap-4" ]
-                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "3" ]
-                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
-                                [ text "Une fois votre sélection finie, "
-                                , span [ class "font-black text-slate-800" ] [ text "confirmez votre choix" ]
-                                , text " via le bouton email dans l'onglet Mon Planning."
-                                ]
-                            ]
-                        , div [ class "flex items-start gap-4" ]
-                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-full flex items-center justify-center mt-0.5" ] [ text "4" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5" ] [ text "2" ]
                             , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
                                 [ text "N'oubliez pas d'"
                                 , span [ class "font-black text-slate-800" ] [ text "ajouter les horaires" ]
-                                , text " dans votre agenda en cliquant sur l'icône calendrier "
+                                , text " dans votre agenda via l'icône "
                                 , span [ class "font-black text-slate-800" ] [ text "📅" ]
                                 , text "."
+                                ]
+                            ]
+                        , div [ class "flex items-start gap-4" ]
+                            [ div [ class "flex-shrink-0 w-6 h-6 bg-[#ea3a60] text-white text-xs font-black rounded-md flex items-center justify-center mt-0.5" ] [ text "3" ]
+                            , div [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                                [ text "Une fois votre sélection finie, cliquez sur "
+                                , span [ class "font-black text-slate-800" ] [ text "Voir le récapitulatif" ]
+                                , text " pour confirmer par email."
                                 ]
                             ]
                         ]
@@ -476,10 +471,90 @@ viewSelection model ctx =
                                 ]
                         )
                         periodes
+                    ++ [ div [ class "mt-4 print:hidden" ]
+                            [ button
+                                [ class
+                                    ("flex items-center justify-center gap-3 w-full py-5 rounded-2xl font-black shadow-lg transition-all active:scale-95 text-lg "
+                                        ++ (if nbSelected > 0 then
+                                                "bg-[#ea3a60] text-white hover:bg-[#c42d50] cursor-pointer"
+
+                                            else
+                                                "bg-slate-100 text-slate-400 cursor-not-allowed"
+                                           )
+                                    )
+                                , onClick GoToRecap
+                                , Html.Attributes.disabled (nbSelected == 0)
+                                ]
+                                [ span [ class "text-xl" ] [ text "�" ]
+                                , text
+                                    (if nbSelected > 0 then
+                                        "Voir le récapitulatif ("
+                                            ++ String.fromInt nbSelected
+                                            ++ " mission"
+                                            ++ (if nbSelected > 1 then
+                                                    "s"
+
+                                                else
+                                                    ""
+                                               )
+                                            ++ ")"
+
+                                     else
+                                        "Sélectionnez des missions pour continuer"
+                                    )
+                                ]
+                            ]
+                       ]
                 )
 
         RecapBenevole ->
-            text ""
+            let
+                missions =
+                    model.benevoles
+                        |> Maybe.map .postesBenevoles
+                        |> Maybe.withDefault []
+
+                selectedMissions =
+                    Benevoles.getMissionsSelectionnees model.selectedMissions missions
+            in
+            div [ class "flex flex-col gap-6" ]
+                [ div [ class "bg-[#ea3a60]/5 rounded-[2.5rem] p-6 border border-[#ea3a60]/10" ]
+                    [ div [ class "flex items-center gap-3 mb-4" ]
+                        [ span [ class "text-2xl" ] [ text "📋" ]
+                        , h2 [ class "text-lg font-black text-[#ea3a60] uppercase tracking-wider" ] [ text "Récapitulatif" ]
+                        ]
+                    , p [ class "text-sm text-slate-500 font-medium mb-6" ]
+                        [ text "Vérifiez vos missions avant de confirmer. Un email s'ouvrira dans votre application de messagerie." ]
+                    , div [ class "space-y-3 mb-6" ]
+                        (if List.isEmpty selectedMissions then
+                            [ div [ class "text-center py-8 text-slate-400" ]
+                                [ div [ class "text-3xl mb-2" ] [ text "😕" ]
+                                , p [ class "font-medium" ] [ text "Aucune mission sélectionnée." ]
+                                ]
+                            ]
+
+                         else
+                            List.map viewRecapMissionItem selectedMissions
+                        )
+                    , a
+                        [ href (buildMailtoUrl selectedMissions)
+                        , class "flex items-center justify-center gap-3 w-full py-5 bg-[#ea3a60] text-white rounded-2xl font-black shadow-lg hover:bg-[#c42d50] transition-all active:scale-95 text-lg"
+                        , Html.Attributes.attribute "id" "btn-confirmer-email"
+                        , onClick ConfirmMissions
+                        ]
+                        [ span [ class "text-xl" ] [ text "✉️" ]
+                        , text "CONFIRMER PAR EMAIL"
+                        ]
+                    , p [ class "text-[10px] text-center text-slate-400 mt-2 font-medium" ] [ text "Envoie votre sélection par mail au responsable" ]
+                    , button
+                        [ class "mt-4 flex items-center justify-center gap-2 w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:border-slate-300 transition-all active:scale-95"
+                        , onClick GoBack
+                        ]
+                        [ span [] [ text "←" ]
+                        , text "Retour à la sélection"
+                        ]
+                    ]
+                ]
 
         MonPlanning ->
             text ""
@@ -531,12 +606,12 @@ viewMissionCheckbox mission isChecked =
                     [ text mission.mission ]
                 , div
                     [ class
-                        ("w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors flex-shrink-0 "
+                        ("w-5 h-5 rounded-sm border-2 flex items-center justify-center transition-colors flex-shrink-0 "
                             ++ (if isChecked then
                                     "border-[#ea3a60] bg-[#ea3a60]"
 
                                 else
-                                    "border-slate-200 bg-white"
+                                    "border-slate-300 bg-white"
                                )
                         )
                     ]
@@ -716,7 +791,6 @@ viewPlanning model ctx =
                                 , button [ class "text-[10px] font-black text-[#ea3a60] uppercase border-b border-[#ea3a60]/20 pb-0.5", onClick ExportAllMissions ] [ text "Tout exporter 📅" ]
                                 ]
                             , div [ class "space-y-3" ] (List.map (viewBenevoleMissionItem shouldMask nowMinutes) selectedMissions)
-                            , viewConfirmationButton selectedMissions
                             ]
                         ]
                     , if List.isEmpty coachHoraires then
@@ -1042,8 +1116,8 @@ onClick msg =
     Html.Events.on "click" (Decode.succeed msg)
 
 
-viewConfirmationButton : List Benevoles.Mission -> Html Msg
-viewConfirmationButton selectedMissions =
+buildMailtoUrl : List Benevoles.Mission -> String
+buildMailtoUrl selectedMissions =
     let
         recipient =
             "exemple@llnp.fr"
@@ -1059,7 +1133,6 @@ viewConfirmationButton selectedMissions =
                 ++ String.join "\n" (List.map missionLine selectedMissions)
                 ++ "\n\nNom / Prénom : [À COMPLÉTER]\n\nCordialement."
 
-        -- Manual URI encoding for basics
         encode s =
             s
                 |> String.replace "%" "%25"
@@ -1070,19 +1143,48 @@ viewConfirmationButton selectedMissions =
                 |> String.replace "è" "%C3%A8"
                 |> String.replace "ê" "%C3%AA"
                 |> String.replace "ç" "%C3%A7"
-
-        url =
-            "mailto:" ++ recipient ++ "?subject=" ++ encode subject ++ "&body=" ++ encode body
     in
-    div [ class "mt-8 print:hidden" ]
-        [ a
-            [ href url
-            , class "flex items-center justify-center gap-3 w-full py-4 bg-[#171717] text-white rounded-2xl font-black shadow-lg hover:bg-[#ea3a60] transition-all active:scale-95"
+    "mailto:" ++ recipient ++ "?subject=" ++ encode subject ++ "&body=" ++ encode body
+
+
+viewRecapMissionItem : Benevoles.Mission -> Html Msg
+viewRecapMissionItem mission =
+    let
+        timeRange =
+            case ( mission.debut, mission.fin ) of
+                ( Just s, Just e ) ->
+                    s ++ " - " ++ e
+
+                ( Just s, Nothing ) ->
+                    s
+
+                _ ->
+                    ""
+
+        locationBadge =
+            if String.contains "REZE" (String.toUpper mission.lieu) then
+                span [ class "px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-black rounded-md" ] [ text "📍 REZÉ" ]
+
+            else
+                span [ class "px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-black rounded-md" ] [ text "📍 PETIT PORT" ]
+    in
+    div [ class "flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm" ]
+        [ div [ class "flex-shrink-0 w-10 h-10 bg-[#ea3a60]/10 rounded-xl flex items-center justify-center text-xl" ]
+            [ text mission.icone ]
+        , div [ class "flex-1 min-w-0" ]
+            [ div [ class "font-black text-sm text-slate-800 uppercase truncate" ] [ text mission.mission ]
+            , div [ class "flex items-center gap-2 mt-1" ]
+                [ locationBadge
+                , if timeRange /= "" then
+                    span [ class "px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-black rounded-md" ] [ text ("🕒 " ++ timeRange) ]
+
+                  else
+                    text ""
+                , span [ class "text-[10px] font-bold text-slate-300 uppercase tracking-widest" ] [ text mission.periode ]
+                ]
             ]
-            [ span [ class "text-xl" ] [ text "✉️" ]
-            , text "CONFIRMER PAR EMAIL"
-            ]
-        , p [ class "text-[10px] text-center text-slate-400 mt-2 font-medium" ] [ text "Envoie votre sélection par mail au responsable" ]
+        , div [ class "flex-shrink-0 w-5 h-5 bg-[#ea3a60] rounded-sm flex items-center justify-center" ]
+            [ span [ class "text-white text-xs font-black" ] [ text "✓" ] ]
         ]
 
 
