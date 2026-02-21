@@ -538,9 +538,10 @@ viewSelection model ctx =
                         )
                     , a
                         [ href (buildMailtoUrl selectedMissions)
+                        , target "_blank"
                         , class "flex items-center justify-center gap-3 w-full py-5 bg-[#ea3a60] text-white rounded-2xl font-black shadow-lg hover:bg-[#c42d50] transition-all active:scale-95 text-lg"
                         , Html.Attributes.attribute "id" "btn-confirmer-email"
-                        , onClick ConfirmMissions
+                        , onClickPreserveDefault ConfirmMissions
                         ]
                         [ span [ class "text-xl" ] [ text "✉️" ]
                         , text "CONFIRMER PAR EMAIL"
@@ -1114,6 +1115,21 @@ onChange tagger =
 onClick : msg -> Attribute msg
 onClick msg =
     Html.Events.on "click" (Decode.succeed msg)
+
+
+{-| Comme onClick mais sans appeler preventDefault.
+Nécessaire quand on attache un handler Elm sur un <a href="mailto:...">
+car le runtime Elm bloque sinon l'ouverture du client mail.
+-}
+onClickPreserveDefault : msg -> Attribute msg
+onClickPreserveDefault msg =
+    Html.Events.custom "click"
+        (Decode.succeed
+            { message = msg
+            , stopPropagation = False
+            , preventDefault = False
+            }
+        )
 
 
 buildMailtoUrl : List Benevoles.Mission -> String
