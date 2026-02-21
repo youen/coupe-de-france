@@ -72,6 +72,7 @@ type UserContext
     | PourBuvette
     | PourVestiaire Int
     | PourBenevole
+    | RecapBenevole
     | MonPlanning
 
 

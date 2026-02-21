@@ -25,6 +25,8 @@ type Msg
     | SetDemoMode Bool
     | SetDemoTime Int
     | GoBack
+    | GoToRecap
+    | ConfirmMissions
     | ExportMission Benevoles.Mission
     | ExportAllMissions
 
@@ -163,8 +165,17 @@ update msg model =
                     else
                         ( { model | contexte = Just (PourVestiaire 0) }, Cmd.none )
 
+                Just RecapBenevole ->
+                    ( { model | contexte = Just PourBenevole }, Cmd.none )
+
                 _ ->
                     ( { model | contexte = Nothing }, Cmd.none )
+
+        GoToRecap ->
+            ( { model | contexte = Just RecapBenevole }, Cmd.none )
+
+        ConfirmMissions ->
+            ( { model | contexte = Just MonPlanning }, Cmd.none )
 
         ExportMission mission ->
             ( model
@@ -266,6 +277,9 @@ viewStandardLayout model ctx =
                     "context-coach"
 
                 PourBenevole ->
+                    "context-benevole"
+
+                RecapBenevole ->
                     "context-benevole"
 
                 MonPlanning ->
@@ -464,6 +478,9 @@ viewSelection model ctx =
                         periodes
                 )
 
+        RecapBenevole ->
+            text ""
+
         MonPlanning ->
             text ""
 
@@ -644,6 +661,9 @@ viewPlanning model ctx =
                     |> List.concatMap viewVestiaireCategorie
 
         PourBenevole ->
+            []
+
+        RecapBenevole ->
             []
 
         MonPlanning ->
