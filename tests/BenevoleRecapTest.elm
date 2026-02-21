@@ -33,4 +33,24 @@ suite =
                         update GoToRecap initialModel
                 in
                 Expect.equal updatedModel.contexte (Just RecapBenevole)
+        , test "GoBack depuis RecapBenevole retourne à PourBenevole" <|
+            \_ ->
+                let
+                    modelOnRecap =
+                        { initialModel | contexte = Just RecapBenevole }
+
+                    ( updatedModel, _ ) =
+                        update GoBack modelOnRecap
+                in
+                Expect.equal updatedModel.contexte (Just PourBenevole)
+        , test "ConfirmMissions bascule le contexte vers MonPlanning" <|
+            \_ ->
+                let
+                    modelOnRecap =
+                        { initialModel | contexte = Just RecapBenevole }
+
+                    ( updatedModel, _ ) =
+                        update ConfirmMissions modelOnRecap
+                in
+                Expect.equal updatedModel.contexte (Just MonPlanning)
         ]
