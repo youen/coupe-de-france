@@ -1144,7 +1144,7 @@ buildMailtoUrl : List Benevoles.Mission -> String
 buildMailtoUrl selectedMissions =
     let
         recipient =
-            "exemple@llnp.fr"
+            "communication.llnp@orange.fr"
 
         subject =
             "Confirmation de participation - Bénévole CDF Synchro 2026"
