@@ -201,5 +201,23 @@ suite =
                             Main.update (Main.SelectEquipe "Equipe B") initialModel
                     in
                     Expect.equal newModel.selectedPatineurTeam "Equipe B"
+            , test "US: Can switch to VoirPlan context" <|
+                \_ ->
+                    let
+                        initialModel =
+                            { planning = []
+                            , benevoles = Nothing
+                            , selectedTeams = Set.empty
+                            , selectedMissions = Set.empty
+                            , selectedPatineurTeam = ""
+                            , contexte = Nothing
+                            , currentTime = Time.millisToPosix 0
+                            , zone = Time.utc
+                            }
+
+                        ( newModel, _ ) =
+                            Main.update (Main.SetContexte VoirPlan) initialModel
+                    in
+                    Expect.equal newModel.contexte (Just VoirPlan)
             ]
         ]

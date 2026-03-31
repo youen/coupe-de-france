@@ -74,6 +74,7 @@ type UserContext
     | PourBenevole
     | RecapBenevole
     | MonPlanning
+    | VoirPlan
 
 
 type alias Model =

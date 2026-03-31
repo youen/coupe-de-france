@@ -243,6 +243,7 @@ viewRoleSelection =
             , roleButton "Bénévole" PourBenevole "🙋" "Sélectionnez vos missions"
             , roleButton "Vestiaire" (PourVestiaire 0) "🚪" "Horaires par numéro de vestiaire"
             , roleButton "Buvette" PourBuvette "☕" "Alerte rushs pour la restauration"
+            , roleButton "Plan Petit Port" VoirPlan "🗺️" "Plan de la patinoire et accès"
             ]
         ]
 
@@ -287,6 +288,9 @@ viewStandardLayout model ctx =
 
                 PourBuvette ->
                     "context-buvette"
+
+                VoirPlan ->
+                    "context-plan"
     in
     div [ class ("min-h-screen bg-white print:p-[10mm] " ++ contextClass) ]
         [ -- Sticky Header
@@ -568,6 +572,21 @@ viewSelection model ctx =
         MonPlanning ->
             text ""
 
+        VoirPlan ->
+            div [ class "flex flex-col items-center gap-6" ]
+                [ div [ class "bg-white p-4 rounded-3xl shadow-xl border border-slate-200 overflow-hidden" ]
+                    [ img [ src "plan-petit-port.png", class "w-full h-auto rounded-2xl" ] []
+                    ]
+                , div [ class "p-6 bg-[#ea3a60]/5 rounded-3xl border border-[#ea3a60]/10 max-w-lg" ]
+                    [ div [ class "flex items-center gap-3 mb-2" ]
+                        [ span [ class "text-xl" ] [ text "📍" ]
+                        , h3 [ class "text-sm font-black text-[#ea3a60] uppercase tracking-wider" ] [ text "Localisation" ]
+                        ]
+                    , p [ class "text-sm text-slate-600 font-medium leading-relaxed" ]
+                        [ text "Préparez votre venue en consultant le plan des vestiaires et des accès à la piste." ]
+                    ]
+                ]
+
 
 viewMissionCheckbox : Benevoles.Mission -> Bool -> Html Msg
 viewMissionCheckbox mission isChecked =
@@ -815,6 +834,9 @@ viewPlanning model ctx =
                             ]
                         ]
                     ]
+
+        VoirPlan ->
+            []
 
 
 viewDemoMode : Model -> Html Msg
