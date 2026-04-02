@@ -213,6 +213,8 @@ suite =
                             , contexte = Nothing
                             , currentTime = Time.millisToPosix 0
                             , zone = Time.utc
+                            , isDemoMode = False
+                            , demoTimeMinutes = 420
                             }
 
                         ( newModel, _ ) =
